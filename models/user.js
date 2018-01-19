@@ -9,10 +9,13 @@ const uuidv4  = require('uuid/v4');
  */
 function Users()
 {
-  // These are PRIVATE letiables, they can only be accessed within this class
+  let c_date = new Date();
+  console.log('creating user model ', c_date.getTime());
+
+  // These are PRIVATE variables, they can only be accessed within this class
   let mysql_connection = null;
 
-  this.getUser = function(param)
+  this.getUserBy = function(param)
   {
     if (param.hasOwnProperty('email')) {
       return this.getUserByEmail(param.email);
@@ -21,70 +24,61 @@ function Users()
     if (param.hasOwnProperty('id')) {
       return this.getUserById(param.id);
     }
+
+    return new Promise((resolve, reject) => {
+      reject({user_id: null, message: 'No user found'});
+    })
+  }
+
+  this.getUser = function(sql, params)
+  {
+    let parent = this;
+
+    mysql_connection = mysql.createConnection(configs);
+
+    return this.mysqlConnect()
+      .then((connectionId) =>
+      {
+        console.log(`getUser: connection id: ${connectionId}`);
+        return parent.runQuery(sql, params);
+      })
+      .then((results) =>
+      {
+        mysql_connection.end((err) => {
+          if (err) {
+            console.log('error terminating connection: ', mysql_connection.threadId);
+            console.log('error ', err);
+          }
+        });
+
+        if (results.resultSet.length === 0) {
+          return null;
+        }
+
+        let resultSet = results.resultSet[0];
+
+        // return our result to the calling method.
+        return (resultSet);
+      })
+      .catch(error => {
+        throw error;
+      });
   }
 
   this.getUserByEmail = function(email)
   {
-    let parent = this;
+    let sql = 'SELECT user_id, first_name, last_name, upassword, email, '
+      + 'birthday, roles FROM users WHERE email = ?';
 
-    mysql_connection = mysql.createConnection(configs);
-
-    return this.mysqlConnect()
-      .then((connectionId) =>
-      {
-        console.log(`getUserByEmail: connection id: ${connectionId}`);
-
-        let sql = 'SELECT user_id, first_name, last_name, upassword, email, '
-          + 'birthday, roles FROM users WHERE email = ?';
-
-        return parent.runQuery(sql, [email]);
-      })
-      .then((results) =>
-      {
-        if (results.resultSet.length === 0) {
-          return null;
-        }
-
-        let resultSet = results.resultSet[0];
-
-        // return our result to the calling method.
-        return (resultSet);
-      })
-      .catch(error => {
-        throw error;
-      })
+    return this.getUser(sql, [email]);
   }
 
-  this.getUserById    = function(uuid)
+  this.getUserById = function(id)
   {
-    let parent = this;
+    let sql = 'SELECT user_id, first_name, last_name, upassword, email, '
+    + 'birthday, roles FROM users WHERE user_id = ?';
 
-    mysql_connection = mysql.createConnection(configs);
-
-    return this.mysqlConnect()
-      .then((connectionId) =>
-      {
-        console.log(`connected to ${connectionId}`);
-
-        let sql = 'SELECT user_id, first_name, last_name, upassword, email, '
-          + 'birthday, roles FROM users WHERE id = ?';
-
-        return parent.runQuery(sql, [email]);
-      })
-      .then((results) =>
-      {
-        if (results.resultSet.length === 0) {
-          return null;
-        }
-
-        let resultSet = results.resultSet[0];
-
-        // return our result to the calling method.
-        return (resultSet);
-      })
-      .catch(error => {
-        throw error;
-      })
+    return this.getUser(sql, [id]);
   }
 
   /**
@@ -133,18 +127,32 @@ function Users()
 
         // create our insert query & insert array
         let sql = 'INSERT INTO USERS (user_id, first_name, last_name, '
-          + 'upassword, email, birthday, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        + 'upassword, email, birthday, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)';
 
         return parent.runQuery(sql, insertValues);
       })
       .then(results =>
       {
+        mysql_connection.end((err) => {
+          if (err) {
+            console.log('error terminating connection: ', mysql_connection.threadId);
+            console.log('error ', err);
+          }
+        });
+
         // return an object to our calling method:
         return ({success: 'success', user_id: insertValues[0]});
       })
       .catch(error => {
+        mysql_connection.end((err) => {
+          if (err) {
+            console.log('error terminating connection: ', mysql_connection.threadId);
+            console.log('error ', err);
+          }
+        });
+
         throw error;
-      });
+      })
   }
 
   this.isEmailUnique = function(email)
@@ -175,7 +183,7 @@ function Users()
         if (error) {
           console.log('Error making connection', error);
 
-          throw "Failed connection to database";
+          reject("Failed connection to database");
         }
 
         // we don't have to return anything, this is just to show that Promises
@@ -196,13 +204,6 @@ function Users()
     {
       mysql_connection.query(query, params, function(error, results, fields)
       {
-        mysql_connection.end((err) => {
-          if (err) {
-            console.log('error terminating connection: ', mysql_connection.threadId);
-            console.log('error ', err);
-          }
-        });
-
         if (error) {
           reject(error);
         }

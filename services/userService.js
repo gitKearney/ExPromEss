@@ -5,9 +5,9 @@ function UserService(userModel, timeService)
   let parent = this;
   this.userModel = userModel;
 
-  this.handleGet = function(params, jsonToken)
+  this.handleGet = function(params)
   {
-    return userModel.getUser(params)
+    return userModel.getUserBy(params)
       .then((data) =>
       {
         // don't expose the password,

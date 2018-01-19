@@ -1,3 +1,4 @@
+
 function UserController(userService)
 {
   let parent = this;
@@ -11,7 +12,7 @@ function UserController(userService)
       let userInfo = request.query;
 
       // userService.handleGet() returns a promise object from the userModel
-      parent.userService.handleGet(userInfo, request.headers.authorization)
+      parent.userService.handleGet(userInfo)
         .then((data) => {
           resolve(data);
         })
