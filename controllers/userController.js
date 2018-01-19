@@ -5,20 +5,24 @@ function UserController(userService)
 
   this.userService = userService;
 
-  this.get = function(request, response)
+  this.get = function(request)
   {
     return new Promise(function(resolve, reject)
     {
-      let userInfo = request.query;
+      if (request.headers.hasOwnProperty('authorization') === false) {
+        reject({error: "Access Denied: Invalid Headers"});
+      }
 
-      // userService.handleGet() returns a promise object from the userModel
-      parent.userService.handleGet(userInfo)
-        .then((data) => {
-          resolve(data);
-        })
-        .catch((err) => {
-          reject(err);
-        });
+      resolve(request.params.uuid);
+    })
+    .then(userId => {
+      return parent.userService.handleGet(userId)
+    })
+    .then((data) => {
+      return(data);
+    })
+    .catch((err) => {
+      throw(err);
     });
   }
 

@@ -1,17 +1,30 @@
-let UserController = require('../controllers/userController');
-let UserService    = require('../services/userService');
+/*** IMPORT MODELS ***/
 let UserModel      = require('../models/user');
-let TimeService    = require('../services/timeService');
+
+/*** IMPORT SERVICES ***/
+let AuthService = require('../services/authService');
+let TimeService = require('../services/timeService');
+let UserService = require('../services/userService');
+
+/*** IMPORT CONTROLLERS ***/
+let AuthController = require('../controllers/authController');
+let UserController = require('../controllers/userController');
 
 module.exports = {
-  createController: function()
+  createUserController: function()
   {
     // create our user controller, inject its dependencies into it
     let userModel      = new UserModel();
     let timeService    = new TimeService();
     let userService    = new UserService(userModel, timeService);
-    let userController = new UserController(userService);
+    return new UserController(userService);
+  },
 
-    return userController;
+  createAuthController: function()
+  {
+    // create our user model, inject its dependencies into it
+    let userModel   = new UserModel();
+    let authService = new AuthService(userModel);
+    return new AuthController(authService);
   }
 }

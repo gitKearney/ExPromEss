@@ -34,6 +34,9 @@ function Users()
   {
     let parent = this;
 
+    console.log('sql', sql);
+    console.log('params', params);
+
     mysql_connection = mysql.createConnection(configs);
 
     return this.mysqlConnect()
@@ -52,6 +55,7 @@ function Users()
         });
 
         if (results.resultSet.length === 0) {
+          console.log('no user found (0) ');
           return null;
         }
 
@@ -205,6 +209,7 @@ function Users()
       mysql_connection.query(query, params, function(error, results, fields)
       {
         if (error) {
+          console.log('error running query', error);
           reject(error);
         }
 

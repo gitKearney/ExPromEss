@@ -18,12 +18,12 @@ module.exports = function UserRouter(express)
    * @param {Object} response
    * @returns {string} JSON data stringify
    */
-  userRouter.get('/', function(request, response)
+  userRouter.get('/:uuid', function(request, response)
   {
-    let userController = di.createController();
+    let userController = di.createUserController();
 
     // userController.get() returns a new promise object
-    userController.get(request, response)
+    userController.get(request)
       .then((res) => {
           response.send(res);
       })

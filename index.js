@@ -25,4 +25,8 @@ let UserRouter = require('./routes/userRoutes');
 let userRouter = new UserRouter(express);
 app.use('/users', userRouter);
 
+let AuthRouter = require('./routes/authRoutes');
+let authRouter = new AuthRouter(express);
+app.use('/auth', authRouter);
+
 app.listen(3001);

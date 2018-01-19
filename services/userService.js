@@ -5,9 +5,14 @@ function UserService(userModel, timeService)
   let parent = this;
   this.userModel = userModel;
 
-  this.handleGet = function(params)
+  /**
+   *
+   * @param params
+   * @returns {Promise<T>}
+   */
+  this.handleGet = function(userId)
   {
-    return userModel.getUserBy(params)
+    return userModel.getUserById(userId)
       .then((data) =>
       {
         // don't expose the password,
@@ -16,7 +21,7 @@ function UserService(userModel, timeService)
       })
       .catch((err) =>
       {
-        console.log('UserService cot error ', err);
+        console.log('UserService caught error ', err);
         throw err;
       });
   }
