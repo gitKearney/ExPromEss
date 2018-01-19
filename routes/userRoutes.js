@@ -41,7 +41,7 @@ module.exports = function UserRouter(express)
    */
   userRouter.post('/', function(request, response)
   {
-    let userController = di.createController();
+    let userController = di.createUserController();
 
     userController.post(request, response)
       .then((res) => {
