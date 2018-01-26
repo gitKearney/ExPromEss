@@ -14,8 +14,8 @@ module.exports = function(express)
 
     authController.post(request)
     .then((res) => {
-      console.log('success', res);
-
+      console.log('success authenticating');
+      console.log(res);
       response.send(res);
     })
     .catch((err) => {
@@ -23,5 +23,6 @@ module.exports = function(express)
       response.send(err);
     });
   });
+
   return authRouter;
 }

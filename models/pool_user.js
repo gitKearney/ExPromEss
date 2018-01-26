@@ -41,6 +41,7 @@ function Users()
       .then((results) =>
       {
         if (results.resultSet.length === 0) {
+
           return {
             message: 'No User Found',
             success: false,
@@ -65,7 +66,7 @@ function Users()
       {
         return {
           success: false,
-          message: 'error',
+          message: 'Error Occurred Finding User',
         };
       });
   };
@@ -113,26 +114,36 @@ function Users()
     ];
 
     // use promises to handle all callbacks.
-    return parent.isEmailUnique(postParams.email)
+    return this.isEmailUnique(postParams.email)
       .then((emailResults) =>
       {
+        console.log('email results: ', emailResults);
+
         let found = emailResults.resultSet[0].found;
-        if (found) {
-          return {
-            message: 'user already registered',
+        console.log("found = ", found);
+
+        if (found === 1) {
+          console.log('found email: returning');
+
+          throw {
             success: false,
+            message: 'user already registered',
+            results: [],
           };
         }
 
-        return parent.isUuidUnique(insertValues[0]);
+        console.log('checking for uuid ', insertValues[0]);
+
+        return this.isUuidUnique(insertValues[0]);
       })
       .then(uuidResults =>
       {
         let found = uuidResults.resultSet[0].found;
         if (found) {
-          return {
+          throw {
             message: 'Error Assigning ID',
             success: false,
+            results: [],
           };
         }
 
@@ -147,17 +158,18 @@ function Users()
         // return an object to our calling method:
         return {
           success: true,
-          reports: insertValues[0]
+          results: [insertValues[0]],
         };
       })
       .catch(error =>
       {
         console.log('EXCEPTION OCCURRED - ADDING USER', error);
-
-        return {
-          success: false,
-          reports: 'Error Occurred Adding User'
-        };
+        return error;
+        // return {
+        //   success: false,
+        //   message: 'Error Occurred Adding User',
+        //   results: [],
+        // };
       })
   };
 

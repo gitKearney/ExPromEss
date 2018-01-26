@@ -73,7 +73,6 @@ function ProductController(authService, productService)
       return this.productService.handleUpdate(uuid, body);
     })
     .then(result => {
-      console.log('[productController.patch] result = ', result);
       return result;
     })
     .catch(error => {
@@ -99,8 +98,6 @@ function ProductController(authService, productService)
         return this.productService.handlePost(request.body)
       })
     .then(result => {
-      console.log('[productController.post] result = ', result);
-
       return result;
     })
     .catch(error => {
@@ -119,7 +116,7 @@ function ProductController(authService, productService)
     let body = request.body;
 
     return this.authService.decodeJwt(request.headers)
-    .then((decodeJwt) => {
+    .then((decodedJwt) => {
 
       let userInfo = {...{},
         user_id: decodedJwt.data.user_id,

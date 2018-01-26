@@ -20,16 +20,13 @@ module.exports = function ProductRouter(express)
    */
   productRouter.delete('/:uuid', function(request, response)
   {
-    let productController = di.createproductController();
+    let productController = di.createProductController();
 
     productController.delete(request)
     .then((res) => {
-      console.log('resolving:', res);
       response.send(res);
     })
     .catch(err => {
-      console.log('rejecting:', err);
-
       response.send(err);
     });
   });
@@ -71,7 +68,7 @@ module.exports = function ProductRouter(express)
   });
 
 
-  productRouter.patch('/:uuid', function(request)
+  productRouter.patch('/:uuid', function(request, response)
   {
     let productController = di.createProductController();
 
@@ -97,11 +94,9 @@ module.exports = function ProductRouter(express)
 
     productController.post(request)
     .then((res) => {
-      console.log('[ProductRouter.post] res', res);
       response.send(res);
     })
     .catch((err) => {
-      console.log('[ProductRoutes] error', err);
       response.send(err);
     });
   });

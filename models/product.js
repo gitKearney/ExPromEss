@@ -31,18 +31,16 @@ function Product()
         };
       }
 
-      if (productId === '') {
-        return {
-          success: true,
-          message: 'success',
-          results: results.resultSet,
-        };
-      }
+      let rs = [];
+      results.resultSet.forEach((element) => {
+        let record = {...element};
+        rs.push(record);
+      });
 
       return {
         success: true,
         message: 'success',
-        results: resultSet,
+        results: rs,
       };
     })
     .catch(error =>
@@ -50,7 +48,7 @@ function Product()
       console.log('EXCEPTION OCCURRED SELECTING: ', error);
       return {
         success: false,
-        message: 'Error Occurred Finding User',
+        message: 'Error Occurred Finding Product',
       };
     })
   };
@@ -178,10 +176,10 @@ function Product()
     let values = [productId];
 
     return this.runQuery(sql, values)
-    .then(resultSet => {
-      console.log();
+    .then(result => {
 
-      let updated = resultSet.result.affectedRows === 1;
+      let updated = result.resultSet.affectedRows === 1;
+
       return {
         success: updated,
         message: updated ? 'Success' : 'No Product Found',

@@ -19,13 +19,10 @@ function ProductService(productModel, timeService)
     return productModel.getProductById(productId)
     .then((data) =>
     {
-      console.log('model returned: ', data);
-
       return data;
     })
     .catch((err) =>
     {
-      console.log('productService caught error ', err);
       throw err;
     });
   };
@@ -38,7 +35,7 @@ function ProductService(productModel, timeService)
    */
   this.handleUpdate = function(uuid, params)
   {
-    params.upated_at = timeService.setCurrentTime(new Date()).makeMySQLDatetime();
+    params.updated_at = timeService.setCurrentTime(new Date()).makeMySQLDatetime();
 
     return productModel.updateProduct(uuid, params);
   };
@@ -51,11 +48,9 @@ function ProductService(productModel, timeService)
     {
       this.productModel.addNewProduct(params)
       .then((data) => {
-        console.log('[productService.handlePost] data = ', data);
         resolve(data)
       })
       .catch((err) => {
-        console.log('ERROR! [productService.handlePost] error', err);
         reject({error_msg: err});
       })
     });

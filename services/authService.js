@@ -61,7 +61,11 @@ function AuthService(user)
 
         let token =  jwt.sign(tokenData, app_configs.jwt.secret);
 
-        return token;
+        return {
+          success: true,
+          message: 'success',
+          results: token,
+        };
       })
       .catch(error =>
       {
@@ -102,7 +106,6 @@ function AuthService(user)
     return new Promise((resolve, reject) =>
     {
       if (headers.hasOwnProperty('authorization') === false) {
-
         reject({
           success: false,
           message: 'Access Denied',
@@ -113,7 +116,6 @@ function AuthService(user)
       jwt.verify(jsonToken, app_configs.jwt.secret, (error, decoded) =>
       {
         if (error) {
-
           reject({
             success: false,
             message: 'Access Denied',

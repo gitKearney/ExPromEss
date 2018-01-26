@@ -20,9 +20,13 @@ function UserService(userModel, timeService)
     return userModel.getUserById(userId)
       .then((data) =>
       {
-        // don't expose the password,
+        console.log('get returned', data);
 
-        data.results.map(element => delete(element.upassword));
+        // don't expose the password,
+        if (data.success === true) {
+          data.results.map(element => delete(element.upassword));
+        }
+
         return data;
       })
       .catch((err) =>
@@ -53,12 +57,12 @@ function UserService(userModel, timeService)
     {
       parent.userModel.addUser(params)
         .then((data) => {
-            console.log('[UserService] data = ', data);
-            resolve(data)
+          console.log('addUser returned:', data);
+
+          resolve(data)
         })
         .catch((err) => {
-            console.log('ERROR! [userService.handlePost] error', err);
-            reject({error_msg: err});
+          reject({error_msg: err});
       })
     });
   };

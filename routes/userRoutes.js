@@ -77,7 +77,7 @@ module.exports = function UserRouter(express)
     });
   });
 
-  userRouter.patch('/:uuid', function(request)
+  userRouter.patch('/:uuid', function(request, response)
   {
     let userController = di.createUserController();
 
@@ -110,6 +110,19 @@ module.exports = function UserRouter(express)
           console.log('[UserRoute] error', err);
           response.send(err);
       });
+  });
+
+  userRouter.put('/', function(request, response)
+  {
+    let userController = di.createUserController();
+
+    userController.put(request)
+    .then(res => {
+      response.send(res);
+    })
+    .catch(error => {
+      response.send(false);
+    });
   });
 
   return userRouter;

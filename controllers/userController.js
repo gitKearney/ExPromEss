@@ -101,6 +101,8 @@ function UserController(authService, userService)
   {
     return this.userService.handlePost(request.body)
       .then(result => {
+        console.log('handlePost returned', result);
+
         return result;
       })
       .catch(error => {
@@ -115,7 +117,7 @@ function UserController(authService, userService)
    */
   this.put = function(request)
   {
-    let uuid = request.body.uuid;
+    let uuid = request.body.id;
     let body = request.body;
 
     return this.authService.decodeJwt(request.headers)
