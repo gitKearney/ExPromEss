@@ -4,3 +4,4 @@ node_modules
 package-lock.json
 configs/jwt.js
 configs/mysql.js
+configs/pools.js

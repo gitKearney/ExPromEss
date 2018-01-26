@@ -18,6 +18,30 @@ module.exports = function UserRouter(express)
    * @param {Object} response
    * @returns {string} JSON data stringify
    */
+  userRouter.delete('/:uuid', function(request, response)
+  {
+    let userController = di.createUserController();
+
+    // userController.get() returns a new promise object
+    userController.delete(request)
+      .then((res) => {
+        console.log('resolving:', res);
+        response.send(res);
+      })
+      .catch(err => {
+        console.log('rejecting:', err);
+
+        response.send(err);
+      });
+  });
+
+  /**
+   * this corresponds to GET http://example.com/users
+   *
+   * @param {Object} request
+   * @param {Object} response
+   * @returns {string} JSON data stringify
+   */
   userRouter.get('/:uuid', function(request, response)
   {
     let userController = di.createUserController();
@@ -29,6 +53,40 @@ module.exports = function UserRouter(express)
       })
       .catch(err => {
           response.send(err);
+      });
+  });
+
+  /**
+   * this corresponds to GET http://example.com/users
+   *
+   * @param {Object} request
+   * @param {Object} response
+   * @returns {string} JSON data stringify
+   */
+  userRouter.get('/', function(request, response)
+  {
+    let userController = di.createUserController();
+
+    // userController.get() returns a new promise object
+    userController.get(request)
+    .then((res) => {
+      response.send(res);
+    })
+    .catch(err => {
+      response.send(err);
+    });
+  });
+
+  userRouter.patch('/:uuid', function(request)
+  {
+    let userController = di.createUserController();
+
+    userController.patch(request)
+      .then(res => {
+        response.send(res);
+      })
+      .catch(error => {
+        response.send(false);
       });
   });
 

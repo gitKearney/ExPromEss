@@ -10,7 +10,6 @@ const uuidv4  = require('uuid/v4');
 function Users()
 {
   let c_date = new Date();
-  console.log('creating user model ', c_date.getTime());
 
   // These are PRIVATE variables, they can only be accessed within this class
   let mysql_connection = null;
@@ -175,7 +174,6 @@ function Users()
 
   /**
    * Run this method when trying to connect to the database
-   * @param Object error
    * @return Promise
    */
   this.mysqlConnect = function()

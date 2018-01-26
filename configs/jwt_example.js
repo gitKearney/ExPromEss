@@ -9,6 +9,8 @@ module.exports = {
     issuer: 'http://example.com',
     expire: 60, // minutes to live
     secret: 'MySecretPassPhrase',
+    // for an excellent secret, run this command: head /dev/urandom | uuencode -m - | sed -n 2p | cut -c1-${1:-32}
+    // it returns a random 32 character string
   }
 }
 

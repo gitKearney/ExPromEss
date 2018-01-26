@@ -7,22 +7,28 @@ let app_configs = require('../configs/jwt.js');
  */
 function AuthService(user)
 {
-  let parent = this;
-  let userInfo = {};
 
   this.authenticate = function(params)
   {
+    let userInfo = {};
+
     return user.getUserByEmail(params.email)
-      .then(user =>
+      .then(result =>
       {
-        if (user === null) {
-          throw {error: 'Incorrect email password combination'};
+        let user  = result.results[0];
+
+        if (result.success === false) {
+          return {
+            message: 'Incorrect email password combination',
+            success: false,
+          };
         }
 
-        userInfo = {...{}, email: user.email, roles: user.roles};
+        userInfo.email = user.email;
+        userInfo.user_id = user.user_id;
 
         // verify the password
-        return parent.verifyPassword(params.password, user.upassword);
+        return this.verifyPassword(params.password, user.upassword);
       })
       .then(matched =>
       {
@@ -53,11 +59,13 @@ function AuthService(user)
           nbf: currentTime,
         };
 
-        return jwt.sign(tokenData, app_configs.jwt.secret);
+        let token =  jwt.sign(tokenData, app_configs.jwt.secret);
+
+        return token;
       })
       .catch(error =>
       {
-        return {'error': error}
+        return error;
       })
   }
 
@@ -69,6 +77,9 @@ function AuthService(user)
    */
   this.verifyPassword = function(postPassword, userPassword)
   {
+    console.log('postPassword:', postPassword);
+    console.log('userPassword:', userPassword);
+
     return new Promise((resolve, reject) =>
     {
       bcrypt.compare(postPassword, userPassword, (err, result) => {
@@ -83,23 +94,31 @@ function AuthService(user)
 
   /**
    *
-   * @param {string} jasonToken
+   * @param {Object} headers
    * @returns {Promise<any>}
    */
-  this.decodeJwt = function(jasonToken)
+  this.decodeJwt = function(headers)
   {
     return new Promise((resolve, reject) =>
     {
-      jwt.verify(jasonToken, app_configs.jwt.secret, (error, decoded) =>
+      if (headers.hasOwnProperty('authorization') === false) {
+
+        reject({
+          success: false,
+          message: 'Access Denied',
+        });
+      }
+
+      let jsonToken = headers.authorization;
+      jwt.verify(jsonToken, app_configs.jwt.secret, (error, decoded) =>
       {
         if (error) {
-          throw {
-            error_name: 'Auth Error',
-            error_msg : error.message,
-          };
-        }
 
-        console.log('verified the token');
+          reject({
+            success: false,
+            message: 'Access Denied',
+          });
+        }
 
         resolve(decoded);
       });

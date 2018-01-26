@@ -29,4 +29,8 @@ let AuthRouter = require('./routes/authRoutes');
 let authRouter = new AuthRouter(express);
 app.use('/auth', authRouter);
 
+let ProductRouter = require('./routes/productRoutes');
+let productRouter = new ProductRouter(express);
+app.use('/products', productRouter);
+
 app.listen(3001);

@@ -20,7 +20,7 @@ function TimeService() {
    */
   this.makeMySQLDatetime = function()
   {
-    console.log('current is', current);
+    // console.log('current is', current);
 
     let year    = current.getFullYear();
     let month   = current.getMonth() + 1;

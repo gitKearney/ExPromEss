@@ -5,6 +5,11 @@ function UserService(userModel, timeService)
   let parent = this;
   this.userModel = userModel;
 
+  this.handleDelete = function(userId)
+  {
+    return userModel.deleteUser(userId);
+  }
+
   /**
    *
    * @param params
@@ -16,7 +21,8 @@ function UserService(userModel, timeService)
       .then((data) =>
       {
         // don't expose the password,
-        delete(data['upassword']);
+
+        data.results.map(element => delete(element.upassword));
         return data;
       })
       .catch((err) =>
@@ -24,7 +30,20 @@ function UserService(userModel, timeService)
         console.log('UserService caught error ', err);
         throw err;
       });
-  }
+  };
+
+  /**
+   *
+   * @param {string} uuid
+   * @param {Object} params
+   * @return {Promise}
+   */
+  this.handleUpdate = function(uuid, params)
+  {
+    params.currentTime = timeService.setCurrentTime(new Date()).makeMySQLDatetime();
+
+    return userModel.updateUser(uuid, params);
+  };
 
   this.handlePost = function(params)
   {
@@ -42,7 +61,7 @@ function UserService(userModel, timeService)
             reject({error_msg: err});
       })
     });
-  }
+  };
 }
 
 module.exports = UserService;

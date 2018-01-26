@@ -14,11 +14,12 @@ module.exports = function(express)
 
     authController.post(request)
     .then((res) => {
-      console.log('[AuthRoute] token: ', res);
+      console.log('success', res);
+
       response.send(res);
     })
     .catch((err) => {
-      console.log('[AuthRoute] error', err);
+      console.log('error', err);
       response.send(err);
     });
   });
