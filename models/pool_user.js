@@ -1,6 +1,5 @@
 let bcrypt   = require('bcrypt-nodejs');
 let pool     = require('../configs/pools').pool;
-const uuidv4 = require('uuid/v4');
 
 /**
  * This constructor function is responsible for running queries against
@@ -8,7 +7,7 @@ const uuidv4 = require('uuid/v4');
  */
 function Users()
 {
-  columnNames = [
+  let columnNames = [
     'user_id',
     'first_name',
     'last_name',
@@ -115,12 +114,13 @@ function Users()
     let parent = this;
 
     let insertValues = [
-      uuidv4(),
+      postParams.user_id,
       postParams.first_name,
       postParams.last_name,
       bcrypt.hashSync(postParams.password),
       postParams.email,
       postParams.birthday,
+      postParams.roles,
       postParams.created_at,
       postParams.updated_at
     ];
@@ -158,7 +158,7 @@ function Users()
         // create our insert query & insert array
         let sql = 'INSERT INTO USERS (user_id, first_name, last_name, '
         + 'upassword, email, birthday, roles, created_at, updated_at) '
-        + 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ")';
+        + 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
         return parent.runQuery(sql, insertValues);
       })
@@ -301,6 +301,11 @@ function Users()
       });
     });
   };
+
+  this.getColumnNames = function()
+  {
+    return columnNames;
+  }
 }
 
 module.exports = Users;

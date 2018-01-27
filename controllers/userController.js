@@ -101,8 +101,6 @@ function UserController(authService, userService)
   {
     return this.userService.handlePost(request.body)
       .then(result => {
-        console.log('handlePost returned', result);
-
         return result;
       })
       .catch(error => {

@@ -103,11 +103,9 @@ module.exports = function UserRouter(express)
 
     userController.post(request, response)
       .then((res) => {
-          console.log('[UserRoutes] res', res);
           response.send(res);
       })
       .catch((err) => {
-          console.log('[UserRoute] error', err);
           response.send(err);
       });
   });

@@ -80,6 +80,7 @@ function Product()
     let holders = [];
 
     for(let prop in body) {
+      // get only actual properties and not constructor properties
       if (body.hasOwnProperty(prop)) {
         // check to make sure the property is valid
         if (columnNames.indexOf(prop) !== -1) {

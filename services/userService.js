@@ -49,17 +49,52 @@ function UserService(userModel, timeService)
 
   this.handlePost = function(params)
   {
-    params.created_at = timeService.setCurrentTime(new Date()).makeMySQLDatetime();
-    params.updated_at = null;
-    params.roles      = 'read'; // all users are read, admin changes them
-
-    return parent.userModel.addUser(params)
+    return this.verifyPostParams(params)
+    .then(values => {
+      return this.userModel.addUser(values);
+    })
     .then((data) => {
       return (data)
     })
     .catch((error) => {
       return (error);
     })
+  };
+
+  /**
+   *
+   * @param {Object} params
+   * @return {Promise}
+   */
+  this.verifyPostParams = function(params)
+  {
+    return new Promise((resolve, reject) =>
+    {
+      params.user_id    = uuidv4();
+      params.created_at = timeService.setCurrentTime(new Date()).makeMySQLDatetime();
+      params.updated_at = null;
+      params.roles      = 'read'; // all users are read, admin changes them
+
+      // make sure that post contains all columns
+      let userColumns  = this.userModel.getColumnNames();
+      let insertValues = {};
+      let paramCount   = 0;
+
+      for(let param in params) {
+        if (params.hasOwnProperty(param)) {
+          if (userColumns.indexOf(param) !== -1) {
+            insertValues[param] = params[param];
+            paramCount++;
+          }
+        }
+      }
+
+      if (userColumns.length !== paramCount) {
+        reject({success: false, message: 'Invalid Params', results: []});
+      }
+
+      resolve(insertValues);
+    });
   };
 }
 
