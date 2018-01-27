@@ -7,6 +7,15 @@ const uuidv4 = require('uuid/v4');
  */
 function Product()
 {
+  let columnNames = [
+  'product_id',
+  'title',
+  'price',
+  'quantity',
+  'created_at',
+  'updated_at',
+  ];
+
   /**
    * Selects a product by ID
    * @param {string} productId
@@ -72,11 +81,17 @@ function Product()
 
     for(let prop in body) {
       if (body.hasOwnProperty(prop)) {
-        // avoid getting anything from prototype
-        insert.push(prop);
-        holders.push('?');
-        values.push(body[prop]);
+        // check to make sure the property is valid
+        if (columnNames.indexOf(prop) !== -1) {
+          insert.push(prop);
+          holders.push('?');
+          values.push(body[prop]);
+        }
       }
+    }
+
+    if (holders.length === 0 || holders.length !== columnNames.length) {
+      throw({success: false, message: 'Invalid Params', results: []});
     }
 
     sql += insert.join(',') + val + holders.join(',') + end;

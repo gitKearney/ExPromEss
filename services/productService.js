@@ -43,6 +43,7 @@ function ProductService(productModel, timeService)
   this.handlePost = function(params)
   {
     params.created_at = timeService.setCurrentTime(new Date()).makeMySQLDatetime();
+    params.updated_at = null;
 
     return new Promise((resolve, reject) =>
     {

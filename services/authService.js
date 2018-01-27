@@ -12,65 +12,72 @@ function AuthService(user)
   {
     let userInfo = {};
 
-    return user.getUserByEmail(params.email)
-      .then(result =>
-      {
-        let user  = result.results[0];
+    let checkBody = new Promise((resolve, reject) =>
+    {
+      if (! params.hasOwnProperty('password') || ! params.hasOwnProperty('email')) {
+        reject({success: false, message: 'Invalid body'});
+      }
 
-        if (result.success === false) {
-          return {
-            message: 'Incorrect email password combination',
-            success: false,
-          };
-        }
+      resolve(true);
+    });
 
-        userInfo.email = user.email;
-        userInfo.user_id = user.user_id;
+    return checkBody
+    .then(() => {
+      return user.getUserByEmail(params.email);
+    })
+    .then(result => {
+      let user  = result.results[0];
 
-        // verify the password
-        return this.verifyPassword(params.password, user.upassword);
-      })
-      .then(matched =>
-      {
-        if (matched === false) {
-          throw {error: 'Invalid email, or wrong password'};
-        }
-
-        let currentTime = Math.floor(Date.now() / 1000);
-
-        // start building a JWT
-        let tokenData = {
-          // audience: JWT's audience
-          aud: app_configs.jwt.audience,
-
-          // data is our user's info
-          data: userInfo,
-
-          // expiresIn is how many seconds till this token expires
-          exp: currentTime + (60 * app_configs.jwt.expire),
-
-          // issued at time: the time the token is issued at
-          iat: currentTime,
-
-          // the issuer of this token
-          iss: app_configs.jwt.issuer,
-
-          // not before: the token is not good for anytime before this timestamp
-          nbf: currentTime,
-        };
-
-        let token =  jwt.sign(tokenData, app_configs.jwt.secret);
-
+      if (result.success === false) {
         return {
-          success: true,
-          message: 'success',
-          results: token,
+          message: 'Incorrect email password combination',
+          success: false,
         };
-      })
-      .catch(error =>
-      {
-        return error;
-      })
+      }
+
+      userInfo.email = user.email;
+      userInfo.user_id = user.user_id;
+
+      // verify the password
+      return this.verifyPassword(params.password, user.upassword);
+    })
+    .then(() =>
+    {
+      let currentTime = Math.floor(Date.now() / 1000);
+
+      // start building a JWT
+      let tokenData = {
+        // audience: JWT's audience
+        aud: app_configs.jwt.audience,
+
+        // data is our user's info
+        data: userInfo,
+
+        // expiresIn is how many seconds till this token expires
+        exp: currentTime + (60 * app_configs.jwt.expire),
+
+        // issued at time: the time the token is issued at
+        iat: currentTime,
+
+        // the issuer of this token
+        iss: app_configs.jwt.issuer,
+
+        // not before: the token is not good for anytime before this timestamp
+        nbf: currentTime,
+      };
+
+      let token =  jwt.sign(tokenData, app_configs.jwt.secret);
+
+      return {
+        success: true,
+        message: 'success',
+        results: token,
+      };
+    })
+    .catch(error =>
+    {
+      return error;
+    });
   }
 
   /**
@@ -81,9 +88,6 @@ function AuthService(user)
    */
   this.verifyPassword = function(postPassword, userPassword)
   {
-    console.log('postPassword:', postPassword);
-    console.log('userPassword:', userPassword);
-
     return new Promise((resolve, reject) =>
     {
       bcrypt.compare(postPassword, userPassword, (err, result) => {
@@ -91,7 +95,7 @@ function AuthService(user)
           resolve(true);
         }
 
-        resolve(false);
+        reject({success: false, message: "Invalid Password Combo"});
       });
     });
   }

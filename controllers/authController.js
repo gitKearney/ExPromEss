@@ -1,5 +1,5 @@
 /**
- *
+ * Verifies POST password and returns an error or JWT
  * @param {AuthService} authService
  */
 function AuthController(authService)
@@ -8,11 +8,10 @@ function AuthController(authService)
   {
     return authService.authenticate(request.body)
     .then(result => {
-      console.log('auth service returned: ', result);
       return result;
     })
     .catch(error => {
-      console.log('auth service rejected: ', error);
+      console.log('authController.caught error', error);
       return error;
     });
   }
