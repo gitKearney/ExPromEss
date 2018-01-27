@@ -8,6 +8,17 @@ const uuidv4 = require('uuid/v4');
  */
 function Users()
 {
+  columnNames = [
+    'user_id',
+    'first_name',
+    'last_name',
+    'upassword',
+    'email',
+    'birthday',
+    'roles',
+    'created_at',
+    'updated_at',
+  ];
   /**
    *
    * @param {string} userId
@@ -79,7 +90,7 @@ function Users()
   this.getUserByEmail = function(email)
   {
     let sql = 'SELECT user_id, first_name, last_name, upassword, email, '
-    + 'birthday, roles FROM users WHERE email = ?';
+    + 'birthday, roles as role FROM users WHERE email = ?';
 
     return this.getUser(sql, [email]);
   };
@@ -87,7 +98,7 @@ function Users()
   this.getUserById = function(id)
   {
     let sql = 'SELECT user_id, first_name, last_name, upassword, email, '
-    + 'birthday, roles FROM users';
+    + 'birthday, roles as role FROM users';
 
     if (id !== '') {
       sql += ' WHERE user_id = ?';
@@ -110,29 +121,25 @@ function Users()
       bcrypt.hashSync(postParams.password),
       postParams.email,
       postParams.birthday,
-      postParams.currentTime,
+      postParams.created_at,
+      postParams.updated_at
     ];
 
     // use promises to handle all callbacks.
     return this.isEmailUnique(postParams.email)
       .then((emailResults) =>
       {
-        console.log('email results: ', emailResults);
+        // console.log('email results: ', emailResults);
 
         let found = emailResults.resultSet[0].found;
-        console.log("found = ", found);
 
         if (found === 1) {
-          console.log('found email: returning');
-
           throw {
             success: false,
             message: 'user already registered',
             results: [],
           };
         }
-
-        console.log('checking for uuid ', insertValues[0]);
 
         return this.isUuidUnique(insertValues[0]);
       })
@@ -147,9 +154,11 @@ function Users()
           };
         }
 
+        // go through the insert values and see they match up to the columns
         // create our insert query & insert array
         let sql = 'INSERT INTO USERS (user_id, first_name, last_name, '
-        + 'upassword, email, birthday, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        + 'upassword, email, birthday, roles, created_at, updated_at) '
+        + 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ")';
 
         return parent.runQuery(sql, insertValues);
       })

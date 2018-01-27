@@ -20,8 +20,6 @@ function UserService(userModel, timeService)
     return userModel.getUserById(userId)
       .then((data) =>
       {
-        console.log('get returned', data);
-
         // don't expose the password,
         if (data.success === true) {
           data.results.map(element => delete(element.upassword));
@@ -51,20 +49,17 @@ function UserService(userModel, timeService)
 
   this.handlePost = function(params)
   {
-    params.currentTime = timeService.setCurrentTime(new Date()).makeMySQLDatetime();
+    params.created_at = timeService.setCurrentTime(new Date()).makeMySQLDatetime();
+    params.updated_at = null;
+    params.roles      = 'read'; // all users are read, admin changes them
 
-    return new Promise(function(resolve, reject)
-    {
-      parent.userModel.addUser(params)
-        .then((data) => {
-          console.log('addUser returned:', data);
-
-          resolve(data)
-        })
-        .catch((err) => {
-          reject({error_msg: err});
-      })
-    });
+    return parent.userModel.addUser(params)
+    .then((data) => {
+      return (data)
+    })
+    .catch((error) => {
+      return (error);
+    })
   };
 }
 

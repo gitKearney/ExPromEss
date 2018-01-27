@@ -6,6 +6,7 @@ const uuidv4  = require('uuid/v4');
 /**
  * This constructor function is responsible for running queries against
  * the mysql database
+ * @deprecated this uses single connections - use pool_user instead
  */
 function Users()
 {
