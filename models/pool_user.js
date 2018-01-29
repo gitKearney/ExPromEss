@@ -117,7 +117,7 @@ function Users()
       postParams.user_id,
       postParams.first_name,
       postParams.last_name,
-      bcrypt.hashSync(postParams.password),
+      bcrypt.hashSync(postParams.upassword),
       postParams.email,
       postParams.birthday,
       postParams.roles,
