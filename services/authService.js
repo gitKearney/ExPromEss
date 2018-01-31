@@ -11,6 +11,7 @@ function AuthService(user)
   this.authenticate = function(params)
   {
     let userInfo = {};
+    let userRes = {};
 
     let checkBody = new Promise((resolve, reject) =>
     {
@@ -26,20 +27,23 @@ function AuthService(user)
       return user.getUserByEmail(params.email);
     })
     .then(result => {
-      let user  = result.results[0];
+
+      console.log('result (from getUserByEmail)', result);
 
       if (result.success === false) {
-        return {
+        throw {
           message: 'Incorrect email password combination',
           success: false,
         };
       }
 
-      userInfo.email = user.email;
-      userInfo.user_id = user.user_id;
+      userRes  = result.results[0];
+      userInfo.email = userRes.email;
+      userInfo.user_id = userRes.user_id;
+
 
       // verify the password
-      return this.verifyPassword(params.password, user.upassword);
+      return this.verifyPassword(params.password, userRes.upassword);
     })
     .then(() =>
     {
@@ -71,7 +75,13 @@ function AuthService(user)
       return {
         success: true,
         message: 'success',
-        results: token,
+        results: {
+          token: token,
+          email: userRes.email,
+          firstName: userRes.first_name,
+          lastName: userRes.last_name,
+          userNumber: userRes.user_id,
+        }
       };
     })
     .catch(error =>
