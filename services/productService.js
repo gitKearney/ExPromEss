@@ -27,6 +27,19 @@ function ProductService(productModel, timeService)
     });
   };
 
+  this.getPaginatedData = function(page)
+  {
+    return productModel.getProductsByPage(page)
+    .then((data) =>
+    {
+      return data;
+    })
+    .catch((err) =>
+    {
+      throw err;
+    });
+  }
+
   /**
    *
    * @param {string} uuid

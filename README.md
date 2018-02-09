@@ -48,3 +48,5 @@ We then create an `AuthService` object. The `AuthService` class takes in a
 *The reason we are doing things this way is to prevent instantiating only 1 instance
 of any class. We want each HTTP request to have its own classes to operate. This
 makes our code able to handle multiple requests, and scale better*
+
+

@@ -31,6 +31,10 @@ app.use('/auth', authRouter);
 
 let ProductRouter = require('./routes/productRoutes');
 let productRouter = new ProductRouter(express);
-app.use('/products', productRouter);
+app.use('/product', productRouter);
+
+let ProductsRouter = require('./routes/productsRoutes');
+let productsRouter = new ProductsRouter(express);
+app.use('/products', productsRouter);
 
 app.listen(3001);

@@ -32,7 +32,7 @@ module.exports = function ProductRouter(express)
   });
 
   /**
-   * this corresponds to GET http://example.com/users
+   * Return info about a single product
    *
    * @param {Object} request
    * @param {Object} response
@@ -52,7 +52,7 @@ module.exports = function ProductRouter(express)
     });
   });
 
-
+  // TODO: disable this route - only have products
   productRouter.get('/', function(request, response)
   {
     let productController = di.createProductController();

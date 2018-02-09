@@ -15,6 +15,7 @@ let ProductService = require('../services/productService');
 let AuthController    = require('../controllers/authController');
 let UserController    = require('../controllers/userController');
 let ProductController = require('../controllers/productController');
+let ProductsController = require('../controllers/productsController');
 
 module.exports = {
   createUserController: function()
@@ -45,5 +46,17 @@ module.exports = {
     let productController = new ProductController(authService, productService);
 
     return productController;
+  },
+
+  createProductsController: function()
+  {
+    let userModel    = new UserModel();
+    let productModel = new ProductModel();
+    let authService  = new AuthService(userModel);
+    let timeService    = new TimeService();
+    let productService = new ProductService(productModel, timeService);
+    let productsController = new ProductsController(authService, productService);
+
+    return productsController;
   },
 }
