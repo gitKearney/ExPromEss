@@ -1,4 +1,4 @@
-const di = require('../dependencies/DependencyInjector');
+const di = require('../ioc/Container');
 
 module.exports = function ProductRouter(express)
 {
@@ -53,19 +53,19 @@ module.exports = function ProductRouter(express)
   });
 
   // TODO: disable this route - only have products
-  productRouter.get('/', function(request, response)
-  {
-    let productController = di.createProductController();
-
-    // productController.get() returns a new promise object
-    productController.get(request)
-    .then((res) => {
-      response.send(res);
-    })
-    .catch(err => {
-      response.send(err);
-    });
-  });
+  // productRouter.get('/', function(request, response)
+  // {
+  //   let productController = di.createProductController();
+  //
+  //   // productController.get() returns a new promise object
+  //   productController.get(request)
+  //   .then((res) => {
+  //     response.send(res);
+  //   })
+  //   .catch(err => {
+  //     response.send(err);
+  //   });
+  // });
 
 
   productRouter.patch('/:uuid', function(request, response)

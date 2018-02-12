@@ -1,4 +1,4 @@
-const di = require('../dependencies/DependencyInjector');
+const di = require('../ioc/Container');
 
 module.exports = function ProductRouter(express)
 {

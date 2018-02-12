@@ -1,4 +1,4 @@
-let di = require('../dependencies/DependencyInjector');
+let di = require('../ioc/Container');
 
 module.exports = function(express)
 {

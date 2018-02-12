@@ -16,12 +16,20 @@ function ProductController(authService, productService)
       productId = request.params.uuid;
     }
 
-    return this.productService.handleGet(productId)
+    return this.authService.decodeJwt(request.headers)
+    .then((decodedJwt) => {
+
+      let userInfo = {...{},
+        user_id: decodedJwt.data.user_id,
+        email: decodedJwt.data.email
+      };
+
+      return this.productService.handleGet(productId);
+    })
     .then(result => {
       return result;
     })
     .catch(error => {
-      console.log('ERROR - productController.GET:', error);
       return error;
     });
   };
