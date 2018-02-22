@@ -1,5 +1,5 @@
 let bcrypt   = require('bcrypt-nodejs');
-let pool     = require('../configs/pools').pool;
+let BaseModel = require('./baseModel');
 
 /**
  * This constructor function is responsible for running queries against
@@ -7,6 +7,8 @@ let pool     = require('../configs/pools').pool;
  */
 function Users()
 {
+  BaseModel.call(this);
+
   let columnNames = [
     'user_id',
     'first_name',
@@ -18,6 +20,7 @@ function Users()
     'created_at',
     'updated_at',
   ];
+  
   /**
    *
    * @param {string} userId
@@ -156,7 +159,7 @@ function Users()
 
         // go through the insert values and see they match up to the columns
         // create our insert query & insert array
-        let sql = 'INSERT INTO USERS (user_id, first_name, last_name, '
+        let sql = 'INSERT INTO users (user_id, first_name, last_name, '
         + 'upassword, email, birthday, roles, created_at, updated_at) '
         + 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
@@ -267,39 +270,6 @@ function Users()
     let sql  = 'SELECT COUNT(*) AS found FROM users WHERE user_id = ?';
 
     return this.runQuery(sql, [uuid]);
-  };
-
-  /**
-   * use this method for running selects
-   * @param {string} query - well formed query
-   * @param {array} params
-   * @return {Promise}
-   */
-  this.runQuery = function(query, params)
-  {
-    return new Promise(function(resolve, reject)
-    {
-      pool.getConnection(function(err, connection)
-      {
-        if (err) {
-          return reject('failed to establish connection');
-        }
-
-        connection.query(query, params, function (error, results, fields)
-        {
-          connection.release();
-
-          if (error) {
-            console.log('error running query:', error);
-            return reject('error with query');
-          }
-
-          // console.log('success running query [fields]', fields);
-          // console.log('success running query [results]', results);
-          resolve({resultSet: results, fieldSet: fields});
-        });
-      });
-    });
   };
 
   this.getColumnNames = function()

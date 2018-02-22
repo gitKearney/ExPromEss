@@ -17,6 +17,8 @@ app.use(function(request, response, next) {
         'Access-Control-Allow-Headers',
         'X-Requested-With, content-type, Authorization');
 
+    response.type('json');
+
     // go to the next middleware route
     next();
 });
@@ -37,4 +39,4 @@ let ProductsRouter = require('./routes/productsRoutes');
 let productsRouter = new ProductsRouter(express);
 app.use('/products', productsRouter);
 
-app.listen(3001);
+app.listen(3123);

@@ -86,8 +86,15 @@ function UserService(userModel, timeService)
             insertValues[param] = params[param];
             paramCount++;
           }
+
+          // convert the password to the upassword column
+          if (param === 'password') {
+            insertValues['upassword'] = params[param];
+            paramCount++;
+          }
         }
       }
+
 
       if (userColumns.length !== paramCount) {
         reject({success: false, message: 'Invalid Params', results: []});

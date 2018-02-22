@@ -15,7 +15,8 @@ CREATE TABLE users
   roles ENUM('read', 'edit', 'create') NOT NULL,
   created_at DATETIME NOT NULL DEFAULT NOW(),
   updated_at DATETIME NULL
-);
+) CHARACTER SET "utf8" 
+ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS products;
 CREATE TABLE products
@@ -26,4 +27,5 @@ CREATE TABLE products
     quantity INTEGER UNSIGNED NOT NULL DEFAULT 0,
     created_at DATETIME NOT NULL DEFAULT NOW(),
     updated_at DATETIME NULL
-);
+) ENGINE=InnoDB
+CHARACTER SET "utf8" ;

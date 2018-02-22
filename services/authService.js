@@ -16,6 +16,7 @@ function AuthService(user)
     let checkBody = new Promise((resolve, reject) =>
     {
       if (! params.hasOwnProperty('password') || ! params.hasOwnProperty('email')) {
+
         reject({success: false, message: 'Invalid body'});
       }
 
@@ -27,8 +28,6 @@ function AuthService(user)
       return user.getUserByEmail(params.email);
     })
     .then(result => {
-
-      console.log('result (from getUserByEmail)', result);
 
       if (result.success === false) {
         throw {

@@ -1,5 +1,6 @@
-let pool     = require('../configs/pools').pool;
 const uuidv4 = require('uuid/v4');
+let BaseModel = require('./baseModel');
+
 
 /**
  * Represents a product
@@ -7,6 +8,8 @@ const uuidv4 = require('uuid/v4');
  */
 function Product()
 {
+  BaseModel.call(this);
+  
   let columnNames = [
   'product_id',
   'title',
@@ -249,40 +252,6 @@ function Product()
       }
     })
   }
-
-  /**
-   *
-   * @param {string} query
-   * @param {array} params
-   * @return {Promise}
-   */
-  this.runQuery = function(query, params)
-  {
-    return new Promise((resolve, reject) =>
-    {
-      pool.getConnection(function(err, connection)
-      {
-        if (err) {
-          console.log('EXCEPTION CONNECTING TO DATABASE');
-          return reject('failed to establish connection');
-        }
-
-        connection.query(query, params, function (error, results, fields)
-        {
-          connection.release();
-
-          if (error) {
-            console.log('EXCEPTION RUNNING QUERY:', error);
-            return reject('error with query');
-          }
-
-          // console.log('success running query [fields]', fields);
-          // console.log('success running query [results]', results);
-          resolve({resultSet: results, fieldSet: fields});
-        });
-      });
-    })
-  };
 
   /**
    * Looks to see if the UUID is unique or not. Resolves to 0 or 1

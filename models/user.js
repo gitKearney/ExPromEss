@@ -130,7 +130,7 @@ function Users()
         }
 
         // create our insert query & insert array
-        let sql = 'INSERT INTO USERS (user_id, first_name, last_name, '
+        let sql = 'INSERT INTO users (user_id, first_name, last_name, '
         + 'upassword, email, birthday, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)';
 
         return parent.runQuery(sql, insertValues);
