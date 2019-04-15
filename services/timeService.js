@@ -1,6 +1,5 @@
 
 function TimeService() {
-
   let current = null;
 
   /**
@@ -8,18 +7,16 @@ function TimeService() {
    * @param {Date} someTime
    * @return TimeService
    */
-  this.setCurrentTime = function(someTime)
-  {
+  this.setCurrentTime = function(someTime) {
     current = someTime;
     return this;
-  }
+  };
 
   /**
    *
    * @returns {string}
    */
-  this.makeMySQLDatetime = function()
-  {
+  this.makeMySQLDatetime = function() {
     // console.log('current is', current);
 
     let year    = current.getFullYear();
@@ -30,27 +27,27 @@ function TimeService() {
     let seconds = current.getSeconds();
 
     if (month < 10) {
-      month = "0" + month;
+      month = '0' + month;
     }
 
     if (day < 10) {
-      day = "0" + day;
+      day = '0' + day;
     }
 
     if (hours < 10) {
-      hours = "0" + hours;
+      hours = '0' + hours;
     }
 
     if (minutes < 10) {
-      minutes = "0" + minutes;
+      minutes = '0' + minutes;
     }
 
     if (seconds < 10) {
-      seconds = "0" + seconds;
+      seconds = '0' + seconds;
     }
 
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-  }
+  };
 }
 
-module.exports =  TimeService;
+module.exports = TimeService;

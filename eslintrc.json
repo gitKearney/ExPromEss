@@ -1,0 +1,36 @@
+{
+  "env": {
+    "commonjs": true,
+    "es6": true,
+    "node": true
+  },
+  "extends": "standard",
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
+  },
+  "parserOptions": {
+    "ecmaVersion": 2018
+  },
+  "rules": {
+    "array-bracket-spacing": ["error", "always"],
+    "comma-dangle": [
+      "error", {
+        "arrays": "always",
+        "objects": "always"
+      }
+    ],
+    "semi": ["error", "always"],
+    "quotes": ["error", "single"],
+    "no-sequences": ["error", "always"],
+    "space-before-function-paren": ["error", "never"],
+    "no-multi-spaces": ["error", {
+        "exceptions": {
+          "VariableDeclarator": true
+        },
+        "ignoreEOLComments": true
+      }
+    ],
+    "generator-star-spacing": ["error", {"before": false, "after": true}]
+  }
+}

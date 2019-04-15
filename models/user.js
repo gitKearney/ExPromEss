@@ -2,21 +2,18 @@ let mysql     = require('mysql');
 let bcrypt    = require('bcrypt-nodejs');
 let configs   = require('../configs/mysql');
 const uuidv4  = require('uuid/v4');
+const MyError = require('../errors/BaseError');
 
 /**
  * This constructor function is responsible for running queries against
  * the mysql database
  * @deprecated this uses single connections - use pool_user instead
  */
-function Users()
-{
-  let c_date = new Date();
-
+function Users() {
   // These are PRIVATE variables, they can only be accessed within this class
-  let mysql_connection = null;
+  let mysqlConnection = null;
 
-  this.getUserBy = function(param)
-  {
+  this.getUserBy = function(param) {
     if (param.hasOwnProperty('email')) {
       return this.getUserByEmail(param.email);
     }
@@ -26,30 +23,29 @@ function Users()
     }
 
     return new Promise((resolve, reject) => {
-      reject({user_id: null, message: 'No user found'});
-    })
-  }
+      const myError = new MyError('No user found');
+      myError.user_id = null;
+      reject(myError);
+    });
+  };
 
-  this.getUser = function(sql, params)
-  {
+  this.getUser = function(sql, params) {
     let parent = this;
 
     console.log('sql', sql);
     console.log('params', params);
 
-    mysql_connection = mysql.createConnection(configs);
+    mysqlConnection = mysql.createConnection(configs);
 
     return this.mysqlConnect()
-      .then((connectionId) =>
-      {
+      .then((connectionId) => {
         console.log(`getUser: connection id: ${connectionId}`);
         return parent.runQuery(sql, params);
       })
-      .then((results) =>
-      {
-        mysql_connection.end((err) => {
+      .then((results) => {
+        mysqlConnection.end((err) => {
           if (err) {
-            console.log('error terminating connection: ', mysql_connection.threadId);
+            console.log('error terminating connection: ', mysqlConnection.threadId);
             console.log('error ', err);
           }
         });
@@ -67,29 +63,26 @@ function Users()
       .catch(error => {
         throw error;
       });
-  }
+  };
 
-  this.getUserByEmail = function(email)
-  {
-    let sql = 'SELECT user_id, first_name, last_name, upassword, email, '
-      + 'birthday, roles FROM users WHERE email = ?';
+  this.getUserByEmail = function(email) {
+    let sql = 'SELECT user_id, first_name, last_name, upassword, email, ' +
+      'birthday, roles FROM users WHERE email = ?';
 
-    return this.getUser(sql, [email]);
-  }
+    return this.getUser(sql, [ email, ]);
+  };
 
-  this.getUserById = function(id)
-  {
-    let sql = 'SELECT user_id, first_name, last_name, upassword, email, '
-    + 'birthday, roles FROM users WHERE user_id = ?';
+  this.getUserById = function(id) {
+    let sql = 'SELECT user_id, first_name, last_name, upassword, email, ' +
+      'birthday, roles FROM users WHERE user_id = ?';
 
-    return this.getUser(sql, [id]);
-  }
+    return this.getUser(sql, [ id, ]);
+  };
 
   /**
    * Inserts a user into the database
    */
-  this.addUser = function(postParams)
-  {
+  this.addUser = function(postParams) {
     let parent = this;
 
     let insertValues = [
@@ -103,110 +96,97 @@ function Users()
     ];
 
     // get a connection to the database
-    mysql_connection = mysql.createConnection(configs);
+    mysqlConnection = mysql.createConnection(configs);
 
     // use promises to handle all callbacks.
     return parent.mysqlConnect()
-      .then((connectionId) =>
-      {
+      .then((connectionId) => {
         console.log(`connected to database: thread id ${connectionId}`);
 
-        return parent.isEmailUnique(postParams.email)
+        return parent.isEmailUnique(postParams.email);
       })
-      .then((emailResults) =>
-      {
+      .then((emailResults) => {
         let found = emailResults.resultSet[0].found;
         if (found) {
-          throw 'user already registered';
+          throw new Error('user already registered');
         }
 
         return parent.isUuidUnique(insertValues[0]);
       })
-      .then(uuidResults =>
-      {
+      .then(uuidResults => {
         let found = uuidResults.resultSet[0].found;
         if (found) {
-          throw 'invalid user ID';
+          throw new Error('invalid user ID');
         }
 
         // create our insert query & insert array
-        let sql = 'INSERT INTO users (user_id, first_name, last_name, '
-        + 'upassword, email, birthday, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        let sql = 'INSERT INTO users (user_id, first_name, last_name, ' +
+          'upassword, email, birthday, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)';
 
         return parent.runQuery(sql, insertValues);
       })
-      .then(results =>
-      {
-        mysql_connection.end((err) => {
+      .then(results => {
+        mysqlConnection.end((err) => {
           if (err) {
-            console.log('error terminating connection: ', mysql_connection.threadId);
+            console.log('error terminating connection: ', mysqlConnection.threadId);
             console.log('error ', err);
           }
         });
 
         // return an object to our calling method:
-        return ({success: 'success', user_id: insertValues[0]});
+        return ({ success: 'success', user_id: insertValues[0], });
       })
       .catch(error => {
-        mysql_connection.end((err) => {
+        mysqlConnection.end((err) => {
           if (err) {
-            console.log('error terminating connection: ', mysql_connection.threadId);
+            console.log('error terminating connection: ', mysqlConnection.threadId);
             console.log('error ', err);
           }
         });
 
         throw error;
-      })
-  }
+      });
+  };
 
-  this.isEmailUnique = function(email)
-  {
+  this.isEmailUnique = function(email) {
     let sql = 'SELECT COUNT(*) AS found FROM users WHERE email = ?';
 
-    return this.runQuery(sql, [email]);
-  }
+    return this.runQuery(sql, [ email, ]);
+  };
 
-  this.isUuidUnique = function(uuid)
-  {
+  this.isUuidUnique = function(uuid) {
     let sql  = 'SELECT COUNT(*) AS found FROM users WHERE user_id = ?';
 
-    return this.runQuery(sql, [uuid]);
-  }
+    return this.runQuery(sql, [ uuid, ]);
+  };
 
   /**
    * Run this method when trying to connect to the database
    * @return Promise
    */
-  this.mysqlConnect = function()
-  {
-    return new Promise(function(resolve, reject)
-    {
-      mysql_connection.connect(function(error)
-      {
+  this.mysqlConnect = function() {
+    return new Promise(function(resolve, reject) {
+      mysqlConnection.connect(function(error) {
         if (error) {
           console.log('Error making connection', error);
-
-          reject("Failed connection to database");
+          reject(new Error('Failed connection to database'));
         }
 
         // we don't have to return anything, this is just to show that Promises
         // can return
-        resolve(mysql_connection.threadId);
+        resolve(mysqlConnection.threadId);
       });
     });
-  }
+  };
 
   /**
    * use this method for running selects
    * @param string query - well formed query
    * @return Promise
    */
-  this.runQuery = function(query, params)
-  {
-    return new Promise(function(resolve, reject)
-    {
-      mysql_connection.query(query, params, function(error, results, fields)
-      {
+  this.runQuery = function(query, params) {
+    return new Promise(function(resolve, reject) {
+      mysqlConnection.query(query, params, function(error, results, fields) {
         if (error) {
           console.log('error running query', error);
           reject(error);
@@ -214,11 +194,10 @@ function Users()
 
         // console.log('success running query [fields]', fields);
         // console.log('success running query [results]', results);
-        resolve({resultSet: results, fieldSet: fields});
+        resolve({ resultSet: results, fieldSet: fields, });
       });
-
     });
-  }
+  };
 }
 
-module.exports =  Users;
+module.exports = Users;
