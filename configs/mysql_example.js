@@ -1,5 +1,12 @@
 /**
- * Example of MySQL configuration file
+ * @deprecated
+ * 
+ * @description Example of MySQL configuration file. This config file is for
+ * for a single connection to mysql. The preferred way to connect to a MySQL
+ * database is using connection pools.
+ * 
+ * See the config file pools_example for how use connection pools with MySQL
+ * 
  * @type {{host: string, user: string, password: string, database: string}}
  */
 module.exports = {
