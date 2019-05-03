@@ -11,6 +11,8 @@ module.exports = {
     secret: 'MySecretPassPhrase',
     // for an excellent secret, run this command: head /dev/urandom | uuencode -m - | sed -n 2p | cut -c1-${1:-32}
     // it returns a random 32 character string
-  }
+  },
+  // for testing if you don't want to have auth, you can turn it off
+  disable_auth: false,
 }
 

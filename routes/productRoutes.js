@@ -1,13 +1,12 @@
 const di = require('../ioc/Container');
 
-module.exports = function ProductRouter(express)
-{
+function ProductRouter(express) {
   // create a router for user URIs
   let productRouter = express.Router();
 
   /* middleware section */
-  productRouter.use(express.urlencoded({extended: true, inflate: true}));
-  productRouter.use(express.json({inflate: true}));
+  productRouter.use(express.urlencoded({ extended: true, inflate: true, }));
+  productRouter.use(express.json({ inflate: true, }));
 
   /* routes section */
 
@@ -18,17 +17,16 @@ module.exports = function ProductRouter(express)
    * @param {Object} response
    * @returns {string} JSON data stringify
    */
-  productRouter.delete('/:uuid', function(request, response)
-  {
+  productRouter.delete('/:uuid', function(request, response) {
     let productController = di.createProductController();
 
     productController.delete(request)
-    .then((res) => {
-      response.send(res);
-    })
-    .catch(err => {
-      response.send(err);
-    });
+      .then((res) => {
+        response.send(res);
+      })
+      .catch(err => {
+        response.send(err);
+      });
   });
 
   /**
@@ -52,22 +50,16 @@ module.exports = function ProductRouter(express)
     });
   });
 
-  // TODO: disable this route - only have products
-  // productRouter.get('/', function(request, response)
-  // {
-  //   let productController = di.createProductController();
-  //
-  //   // productController.get() returns a new promise object
-  //   productController.get(request)
-  //   .then((res) => {
-  //     response.send(res);
-  //   })
-  //   .catch(err => {
-  //     response.send(err);
-  //   });
-  // });
+  /**
+   * The GET route '/' has been disabled because we want the user pointing
+   * to a different route to get all products
+   */
 
-
+  /**
+   * @param {string} uuid
+   * @param {function} callback function
+   * @returns {void}
+   */
   productRouter.patch('/:uuid', function(request, response)
   {
     let productController = di.createProductController();
@@ -123,3 +115,5 @@ module.exports = function ProductRouter(express)
 
   return productRouter;
 }
+
+module.exports = ProductRouter;

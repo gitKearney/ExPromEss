@@ -1,6 +1,7 @@
 let bcrypt      = require('bcrypt-nodejs');
 let jwt         = require('jsonwebtoken');
-let appConfigs = require('../configs/jwt.js');
+let appConfigs  = require('../configs/jwt.js');
+const MyError   = require('../errors/BaseError');
 
 /**
  * @param {Users} user
@@ -11,8 +12,13 @@ function AuthService(user) {
     let userRes = {};
 
     let checkBody = new Promise((resolve, reject) => {
+      if (appConfigs.disable_auth) {
+        resolve(true);
+      }
+
       if (!params.hasOwnProperty('password') || !params.hasOwnProperty('email')) {
-        reject({ success: false, message: 'Invalid body', });
+        let e = new MyError('Invalid Body');
+        reject(e);
       }
 
       resolve(true);
@@ -24,10 +30,8 @@ function AuthService(user) {
       })
       .then(result => {
         if (result.success === false) {
-          throw {
-            message: 'Incorrect email password combination',
-            success: false,
-          };
+          let e = new MyError('Incorrect email password combination');
+          throw e;
         }
 
         userRes = result.results[0];
@@ -93,7 +97,12 @@ function AuthService(user) {
           resolve(true);
         }
 
-        reject({ success: false, message: 'Invalid Password Combo', });
+        if (err) {
+          reject(new MyError(err.message));
+        }
+
+        let e = new MyError('Invalid Password Combo');
+        reject(e);
       });
     });
   };
@@ -106,19 +115,13 @@ function AuthService(user) {
   this.decodeJwt = function(headers) {
     return new Promise((resolve, reject) => {
       if (headers.hasOwnProperty('authorization') === false) {
-        reject({
-          success: false,
-          message: 'Access Denied',
-        });
+        reject(new MyError('Access Denied'));
       }
 
       let jsonToken = headers.authorization;
       jwt.verify(jsonToken, appConfigs.jwt.secret, (error, decoded) => {
         if (error) {
-          reject({
-            success: false,
-            message: 'Access Denied',
-          });
+          reject(new MyError('Access Denied'));
         }
 
         resolve(decoded);

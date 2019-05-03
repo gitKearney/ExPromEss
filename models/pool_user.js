@@ -127,6 +127,7 @@ function Users() {
         let found = emailResults.resultSet[0].found;
 
         if (found === 1) {
+          // TODO: convert this to a custom error
           throw new Error('user already registered');
         }
 

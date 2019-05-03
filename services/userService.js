@@ -1,7 +1,6 @@
 let uuidv4  = require('uuid/v4');
 
 function UserService(userModel, timeService) {
-  let parent = this;
   this.userModel = userModel;
 
   this.handleDelete = function(userId) {
