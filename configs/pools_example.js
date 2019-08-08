@@ -1,7 +1,8 @@
-// if using connection pools
+/**
+ * @description This is the preferred way to connect to a MySQL database
+ */
 
-// TODO: put contents of this file in a new file called 'pools.js'. **DO NOT COMMIT pools.js**
-
+ // TODO: put contents of this file in a new file called 'pools.js'. **DO NOT COMMIT pools.js**
 let mysql   = require('mysql');
 let pool   = mysql.createPool({
   connectionLimit : 28,

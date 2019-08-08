@@ -1,6 +1,5 @@
 
-function UserController(authService, userService)
-{
+function UserController(authService, userService) {
   this.userService = userService;
   this.authService = authService;
 
@@ -9,8 +8,7 @@ function UserController(authService, userService)
    * @param {Object} request
    * @return {Promise}
    */
-  this.get = function(request)
-  {
+  this.get = function(request) {
     let userId = '';
     if (request.params.hasOwnProperty('uuid')) {
       userId = request.params.uuid;
@@ -18,11 +16,10 @@ function UserController(authService, userService)
 
     return this.authService.decodeJwt(request.headers)
       .then(decodedJwt => {
-
         // this is an Object that contains email and user_id
-        let userInfo = {...{},
+        let userInfo = { ...{},
           user_id: decodedJwt.data.user_id,
-          email: decodedJwt.data.email
+          email: decodedJwt.data.email,
         };
 
         return this.userService.handleGet(userId, userInfo);
@@ -34,34 +31,6 @@ function UserController(authService, userService)
         // any call to reject will get caught here
         return error;
       });
-  }
-
-  /**
-   *
-   * @param {Object} request
-   * @return {Promise}
-   */
-  this.delete = function(request)
-  {
-    let userId = request.params.uuid;
-
-    return this.authService.decodeJwt(request.headers)
-    .then(decodedJwt => {
-
-      // this is an Object that contains email and user_id
-      let userInfo = {...{},
-        user_id: decodedJwt.data.user_id,
-        email: decodedJwt.data.email
-      };
-
-      return this.userService.handleDelete(userId, userInfo);
-    })
-    .then(result => {
-      return result;
-    })
-    .catch(error => {
-      return error;
-    });
   };
 
   /**
@@ -69,18 +38,42 @@ function UserController(authService, userService)
    * @param {Object} request
    * @return {Promise}
    */
-  this.patch = function(request)
-  {
+  this.delete = function(request) {
+    let userId = request.params.uuid;
+
+    return this.authService.decodeJwt(request.headers)
+      .then(decodedJwt => {
+        // decodedJwt is an Object that contains email and user_id
+        let userInfo = { ...{},
+          user_id: decodedJwt.data.user_id,
+          email: decodedJwt.data.email,
+        };
+
+        return this.userService.handleDelete(userId, userInfo);
+      })
+      .then(result => {
+        return result;
+      })
+      .catch(error => {
+        return error;
+      });
+  };
+
+  /**
+   *
+   * @param {Object} request
+   * @return {Promise}
+   */
+  this.patch = function(request) {
     let uuid = request.params.uuid;
     let body = request.body;
 
     return this.authService.decodeJwt(request.headers)
       .then(decodedJwt => {
-
-        let userInfo = {...{},
-          user_id: decodedJwt.data.user_id,
-          email: decodedJwt.data.email
-        };
+        // let userInfo = { ...{},
+        //   user_id: decodedJwt.data.user_id,
+        //   email: decodedJwt.data.email,
+        // };
 
         return this.userService.handleUpdate(uuid, body);
       })
@@ -90,15 +83,14 @@ function UserController(authService, userService)
       .catch(error => {
         return error;
       });
-  }
+  };
 
   /**
    *
    * @param {Object} request
-   * @return {Promise<any>}
+   * @return {Promise}
    */
-  this.post = function(request)
-  {
+  this.post = function(request) {
     return this.userService.handlePost(request.body)
       .then(result => {
         return result;
@@ -106,25 +98,23 @@ function UserController(authService, userService)
       .catch(error => {
         return error;
       });
-  }
+  };
 
   /**
    *
    * @param {Object} request
    * @return {Promise}
    */
-  this.put = function(request)
-  {
+  this.put = function(request) {
     let uuid = request.body.id;
     let body = request.body;
 
     return this.authService.decodeJwt(request.headers)
       .then(decodedJwt => {
-
-        let userInfo = {...{},
-          user_id: decodedJwt.data.user_id,
-          email: decodedJwt.data.email
-        };
+        // let userInfo = { ...{},
+        //   user_id: decodedJwt.data.user_id,
+        //   email: decodedJwt.data.email,
+        // };
 
         return this.userService.handleUpdate(uuid, body);
       })
@@ -134,7 +124,7 @@ function UserController(authService, userService)
       .catch(error => {
         return error;
       });
-  }
+  };
 }
 
-module.exports =  UserController;
+module.exports = UserController;

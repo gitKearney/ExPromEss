@@ -31,10 +31,13 @@ let AuthRouter = require('./routes/authRoutes');
 let authRouter = new AuthRouter(express);
 app.use('/auth', authRouter);
 
+// This route performs operations on products, but does not return all products
 let ProductRouter = require('./routes/productRoutes');
 let productRouter = new ProductRouter(express);
 app.use('/product', productRouter);
 
+// this route gets all products. If the user wants only 1 product then they
+// need to call `product/{id}`
 let ProductsRouter = require('./routes/productsRoutes');
 let productsRouter = new ProductsRouter(express);
 app.use('/products', productsRouter);

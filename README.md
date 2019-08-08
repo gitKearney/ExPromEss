@@ -1,8 +1,6 @@
 # An Express application that uses promises instead of callbacks
-
-In trying to better understand Promises (and for an upcoming talk where I compare
-PHP and Node based APIs) I've created this project as a learning tool for anyone
-to better understand Node promises.
+This is a simple project to help me better understand promises and how use
+NodeJS with MySQL
 
 The premise is simple
 
@@ -11,11 +9,21 @@ The premise is simple
 So, all HTTP requests come to the index file. Routing is handled by Express,
 which then creates the Controller and all its dependencies.
 
-The controller then calls a service, which looks at the request and makes 
-decisions on whether to process an update, delete, insert, or select on the 
+The controller then calls a service, which looks at the request and makes
+decisions on whether to process an update, delete, insert, or select on the
 database.
 
-*NOTE: All methods return a Promise*
+## ESLINT TO FIX FILES
+I've decided to use ESLint to help each file feel and look more consistent.
+There is a file: *.eslintrc.json* that contains all the rules
+
+
+When you create a new file (or edit an existing file), be sure to run the 
+following command. ESLint will automatically analyze the code and fix
+it to adhere to the standards
+
+    node_modules/eslint/bin/eslint.js --fix dir/file.js
+
 
 ## FLOW
 When the server starts up, we create a new instances of classes from the `routes`
@@ -23,14 +31,14 @@ directory.
 
 ### Routes
 
-So, take for instance, the `UserRouter`. The `UserRoutes` is class which contains 
+So, take for instance, the `UserRouter`. The `UserRoutes` is class which contains
 methods that correspond to the HTTP method. The `UserRoutes` class imports a module
-`ioc/Container.js`. The *Container* class's purpose is create other classes, 
+`ioc/Container.js`. The *Container* class's purpose is create other classes,
 especially our controller, and return it.
 
-Each of the properties of the `Container` class is a functions whose express 
+Each of the properties of the `Container` class is a functions whose express
 purpose is to create a controller, and its parameters (which are services).
-Since each of the services takes one or more classes as a parameter, the 
+Since each of the services takes one or more classes as a parameter, the
 function also creates the models that are passed into the services.
 
 Here's the code, we'll go over it step by step
@@ -71,13 +79,13 @@ The last line is to create the controller
 Following the `userRoute` let's look at the `controller/UserController` class
 
 The `UserController` class contains methods that correspond to the HTTP verb
-that comes in. 
+that comes in.
 
 Controller methods don't *have* match the HTTP verb. It's something I think makes
 debugging easier, but is not required. Because the controller method names
 match the `Express Router` method names.
 
-Just make sure that the Express Router's method matches the name of the 
+Just make sure that the Express Router's method matches the name of the
 controller.
 
 Each method of the controller returns a Promise. So, our `UserController` returns
@@ -101,8 +109,8 @@ If you notice, our Controller first calls the `AuthService`, then calls the
       })
 
 This is because we make our controllers dumb. The controller simply calls a
-method which returns a Promise. If the Promises resolves, we then call our 
-other service, if the promise is rejected, we resolve the Promise to our 
+method which returns a Promise. If the Promises resolves, we then call our
+other service, if the promise is rejected, we resolve the Promise to our
 `UserRoutes`    
 
 ### Services
@@ -117,9 +125,9 @@ class.
 There are 2 seperate Models in this example: One is if you want to use connection
 pools (**YOU DO**) the other is if you don't (**this won't scale**)
 
-On the successful resolution of the Promise, you can do other things: like 
+On the successful resolution of the Promise, you can do other things: like
 call another method on a different model, call another method on the same model,
-call another service. 
+call another service.
 
 The point is, *Services are where you application logic lives*
 
@@ -132,4 +140,3 @@ The point is, *Services are where you application logic lives*
 Each method on a model builds a query, and returns a promise
 
     return this.runQuery(query, [values])
-

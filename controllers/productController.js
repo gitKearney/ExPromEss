@@ -1,4 +1,3 @@
-
 function ProductController(authService, productService)
 {
   this.productService = productService;

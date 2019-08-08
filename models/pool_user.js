@@ -1,12 +1,11 @@
-let bcrypt   = require('bcrypt-nodejs');
+let bcrypt    = require('bcrypt-nodejs');
 let BaseModel = require('./baseModel');
 
 /**
  * This constructor function is responsible for running queries against
  * the mysql database
  */
-function Users()
-{
+function Users() {
   BaseModel.call(this);
 
   let columnNames = [
@@ -20,16 +19,15 @@ function Users()
     'created_at',
     'updated_at',
   ];
-  
+
   /**
    *
    * @param {string} userId
    * @return {Promise}
    */
-  this.deleteUser = function(userId)
-  {
+  this.deleteUser = function(userId) {
     let query = 'DELETE FROM users WHERE user_id = ?';
-    return this.runQuery(query, [userId])
+    return this.runQuery(query, [ userId, ])
       .then(results => {
         let success = results.resultSet.affectedRows === 1;
 
@@ -48,13 +46,10 @@ function Users()
       });
   };
 
-  this.getUser = function(sql, params)
-  {
+  this.getUser = function(sql, params) {
     return this.runQuery(sql, params)
-      .then((results) =>
-      {
+      .then((results) => {
         if (results.resultSet.length === 0) {
-
           return {
             message: 'No User Found',
             success: false,
@@ -64,7 +59,7 @@ function Users()
 
         let rs = [];
         results.resultSet.forEach((element) => {
-          let record = {...element};
+          let record = { ...element, };
           rs.push(record);
         });
 
@@ -75,8 +70,7 @@ function Users()
           results: rs,
         };
       })
-      .catch(error =>
-      {
+      .catch(() => {
         return {
           success: false,
           message: 'Error Occurred Finding User',
@@ -89,31 +83,28 @@ function Users()
    * @param {string} email
    * @return {Promise}
    */
-  this.getUserByEmail = function(email)
-  {
-    let sql = 'SELECT user_id, first_name, last_name, upassword, email, '
-    + 'birthday, roles as role FROM users WHERE email = ?';
+  this.getUserByEmail = function(email) {
+    let sql = 'SELECT user_id, first_name, last_name, upassword, email, ' +
+    'birthday, roles as role FROM users WHERE email = ?';
 
-    return this.getUser(sql, [email]);
+    return this.getUser(sql, [ email, ]);
   };
 
-  this.getUserById = function(id)
-  {
-    let sql = 'SELECT user_id, first_name, last_name, upassword, email, '
-    + 'birthday, roles as role FROM users';
+  this.getUserById = function(id) {
+    let sql = 'SELECT user_id, first_name, last_name, upassword, email, ' +
+    'birthday, roles as role FROM users';
 
     if (id !== '') {
       sql += ' WHERE user_id = ?';
     }
 
-    return this.getUser(sql, [id]);
+    return this.getUser(sql, [ id, ]);
   };
 
   /**
    * Inserts a user into the database
    */
-  this.addUser = function(postParams)
-  {
+  this.addUser = function(postParams) {
     let parent = this;
 
     let insertValues = [
@@ -125,56 +116,45 @@ function Users()
       postParams.birthday,
       postParams.roles,
       postParams.created_at,
-      postParams.updated_at
+      postParams.updated_at,
     ];
 
     // use promises to handle all callbacks.
     return this.isEmailUnique(postParams.email)
-      .then((emailResults) =>
-      {
+      .then((emailResults) => {
         // console.log('email results: ', emailResults);
 
         let found = emailResults.resultSet[0].found;
 
         if (found === 1) {
-          throw {
-            success: false,
-            message: 'user already registered',
-            results: [],
-          };
+          // TODO: convert this to a custom error
+          throw new Error('user already registered');
         }
 
         return this.isUuidUnique(insertValues[0]);
       })
-      .then(uuidResults =>
-      {
+      .then(uuidResults => {
         let found = uuidResults.resultSet[0].found;
         if (found) {
-          throw {
-            message: 'Error Assigning ID',
-            success: false,
-            results: [],
-          };
+          throw new Error('Error Assigning ID');
         }
 
         // go through the insert values and see they match up to the columns
         // create our insert query & insert array
-        let sql = 'INSERT INTO users (user_id, first_name, last_name, '
-        + 'upassword, email, birthday, roles, created_at, updated_at) '
-        + 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        let sql = 'INSERT INTO users (user_id, first_name, last_name, ' +
+        'upassword, email, birthday, roles, created_at, updated_at) ' +
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
         return parent.runQuery(sql, insertValues);
       })
-      .then(results =>
-      {
+      .then(results => {
         // return an object to our calling method:
         return {
           success: true,
-          results: [insertValues[0]],
+          results: [ insertValues[0], ],
         };
       })
-      .catch(error =>
-      {
+      .catch(error => {
         console.log('EXCEPTION OCCURRED - ADDING USER', error);
         return error;
         // return {
@@ -182,7 +162,7 @@ function Users()
         //   message: 'Error Occurred Adding User',
         //   results: [],
         // };
-      })
+      });
   };
 
   /**
@@ -191,8 +171,7 @@ function Users()
    * @param {array} body
    * @return {Promise}
    */
-  this.updateUser = function(userId, body)
-  {
+  this.updateUser = function(userId, body) {
     let sql = 'UPDATE users SET ';
     let where = ' WHERE user_id = ?';
 
@@ -241,7 +220,7 @@ function Users()
       .then(results => {
         // console.log('updated x records:', results.resultSet.affectedRows);
 
-        let success =  results.resultSet.affectedRows === 1;
+        let success = results.resultSet.affectedRows === 1;
         return {
           success: success,
           message: success ? 'success' : 'No User Found',
@@ -254,28 +233,24 @@ function Users()
           success: false,
           message: 'Error Occurred Updating User',
         };
-
       });
   };
 
-  this.isEmailUnique = function(email)
-  {
+  this.isEmailUnique = function(email) {
     let sql = 'SELECT COUNT(*) AS found FROM users WHERE email = ?';
 
-    return this.runQuery(sql, [email]);
+    return this.runQuery(sql, [ email, ]);
   };
 
-  this.isUuidUnique = function(uuid)
-  {
-    let sql  = 'SELECT COUNT(*) AS found FROM users WHERE user_id = ?';
+  this.isUuidUnique = function(uuid) {
+    let sql = 'SELECT COUNT(*) AS found FROM users WHERE user_id = ?';
 
-    return this.runQuery(sql, [uuid]);
+    return this.runQuery(sql, [ uuid, ]);
   };
 
-  this.getColumnNames = function()
-  {
+  this.getColumnNames = function() {
     return columnNames;
-  }
+  };
 }
 
 module.exports = Users;
