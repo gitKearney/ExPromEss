@@ -1,13 +1,10 @@
 const uuidv4  = require('uuid/v4');
-let BaseModel = require('./baseModel');
 
 /**
  * Represents a product
  * @constructor
  */
 function Product() {
-  BaseModel.call(this);
-
   let columnNames = [
     'product_id',
     'title',

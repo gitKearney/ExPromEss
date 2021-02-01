@@ -1,47 +1,27 @@
+const AuthService = require("../services/authService");
+const UserService = require("../services/userService");
 
+/**
+ * @param {AuthService} authService 
+ * @param {UserService} userService 
+ */
 function UserController(authService, userService) {
-  this.userService = userService;
-  this.authService = authService;
 
-  /**
-   *
-   * @param {Object} request
-   * @return {Promise}
-   */
-  this.get = function(request) {
+  // TODO: pass in request
+  this.get = function(params) {
+    // TODO: get request.get("Authorization")
     let userId = '';
-    if (request.params.hasOwnProperty('uuid')) {
-      userId = request.params.uuid;
+    if (params.hasOwnProperty('uuid')) {
+      userId = params.uuid;
     }
 
-    return this.authService.decodeJwt(request.headers)
-      .then(decodedJwt => {
-        // this is an Object that contains email and user_id
-        let userInfo = { ...{},
-          user_id: decodedJwt.data.user_id,
-          email: decodedJwt.data.email,
-        };
-
-        return this.userService.handleGet(userId, userInfo);
-      })
-      .then(result => {
-        return result;
-      })
-      .catch(error => {
-        // any call to reject will get caught here
-        return error;
-      });
+    return userService.handleGet(userId);
   };
 
-  /**
-   *
-   * @param {Object} request
-   * @return {Promise}
-   */
   this.delete = function(request) {
     let userId = request.params.uuid;
 
-    return this.authService.decodeJwt(request.headers)
+    return authService.decodeJwt(request.headers)
       .then(decodedJwt => {
         // decodedJwt is an Object that contains email and user_id
         let userInfo = { ...{},
@@ -59,11 +39,6 @@ function UserController(authService, userService) {
       });
   };
 
-  /**
-   *
-   * @param {Object} request
-   * @return {Promise}
-   */
   this.patch = function(request) {
     let uuid = request.params.uuid;
     let body = request.body;
@@ -85,26 +60,10 @@ function UserController(authService, userService) {
       });
   };
 
-  /**
-   *
-   * @param {Object} request
-   * @return {Promise}
-   */
-  this.post = function(request) {
-    return this.userService.handlePost(request.body)
-      .then(result => {
-        return result;
-      })
-      .catch(error => {
-        return error;
-      });
+  this.post = function(body) {
+    return userService.handlePost(body);
   };
 
-  /**
-   *
-   * @param {Object} request
-   * @return {Promise}
-   */
   this.put = function(request) {
     let uuid = request.body.id;
     let body = request.body;

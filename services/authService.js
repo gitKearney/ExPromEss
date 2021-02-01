@@ -1,11 +1,8 @@
 let bcrypt      = require('bcrypt-nodejs');
 let jwt         = require('jsonwebtoken');
-let appConfigs  = require('../configs/jwt.js');
+let appConfigs  = require('../configs/jwt.example');
 const MyError   = require('../errors/BaseError');
 
-/**
- * @param {Users} user
- */
 function AuthService(user) {
   this.authenticate = function(params) {
     let userInfo = {};

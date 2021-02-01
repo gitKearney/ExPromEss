@@ -1,23 +1,27 @@
 let uuidv4  = require('uuid/v4');
+const bcrypt = require('bcrypt-nodejs');
 
-function UserService(userModel, timeService) {
-  this.userModel = userModel;
+const Users = require('../models/Users');
+const TimeService = require('./timeService');
+
+/**
+ * 
+ * @param {Users} users 
+ * @param {TimeService} timeService 
+ */
+function UserService(users, timeService) {
 
   this.handleDelete = function(userId) {
     return userModel.deleteUser(userId);
   };
 
-  /**
-   *
-   * @param params
-   * @returns {Promise<T>}
-   */
   this.handleGet = function(userId) {
-    return userModel.getUserById(userId)
+    // TODO: does requestor have access to this user's info?
+    return users.getUserById(userId)
       .then((data) => {
         // don't expose the password,
         if (data.success === true) {
-          data.results.map(element => delete (element.upassword));
+          data.results.forEach(element => delete(element.upassword));
         }
 
         return data;
@@ -28,70 +32,30 @@ function UserService(userModel, timeService) {
       });
   };
 
-  /**
-   *
-   * @param {string} uuid
-   * @param {Object} params
-   * @return {Promise}
-   */
   this.handleUpdate = function(uuid, params) {
-    params.currentTime = timeService.setCurrentTime(new Date()).makeMySQLDatetime();
-
-    return userModel.updateUser(uuid, params);
+    return users.updateUser(uuid, params);
   };
 
   this.handlePost = function(params) {
-    return this.verifyPostParams(params)
-      .then(values => {
-        return this.userModel.addUser(values);
-      })
-      .then((data) => {
-        return (data);
-      })
-      .catch((error) => {
-        return (error);
-      });
+    const values = this.verifyPostParams(params);
+    return users.addUser(values);
   };
 
-  /**
-   *
-   * @param {Object} params
-   * @return {Promise}
-   */
   this.verifyPostParams = function(params) {
-    return new Promise((resolve, reject) => {
-      params.user_id = uuidv4();
-      params.created_at = timeService.setCurrentTime(new Date()).makeMySQLDatetime();
-      params.updated_at = null;
-      params.roles = 'read'; // all users are read, admin changes them
+    params.user_id = uuidv4();
+    
+    let insertValues = {
+      'user_id':    params.user_id ?? null,
+      'first_name': params.first_name ?? null,
+      'last_name':  params.last_name ?? null,
+      'upassword':  params.password ?? null,
+      'email':      params.email ?? null,
+      'birthday':   params.birthday ?? null,
+      'roles':      'read', // all users are read, admin changes them
+    };
 
-      // make sure that post contains all columns
-      let userColumns  = this.userModel.getColumnNames();
-      let insertValues = {};
-      let paramCount   = 0;
-
-      for (let param in params) {
-        if (params.hasOwnProperty(param)) {
-          if (userColumns.indexOf(param) !== -1) {
-            insertValues[param] = params[param];
-            paramCount++;
-          }
-
-          // convert the password to the upassword column
-          if (param === 'password') {
-            insertValues['upassword'] = params[param];
-            paramCount++;
-          }
-        }
-      }
-
-      if (userColumns.length !== paramCount) {
-        reject({ success: false, message: 'Invalid Params', results: [], });
-      }
-
-      resolve(insertValues);
-    });
-  };
+    return insertValues;
+  }
 }
 
 module.exports = UserService;

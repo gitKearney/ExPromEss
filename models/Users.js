@@ -1,30 +1,8 @@
-let bcrypt    = require('bcrypt-nodejs');
-let BaseModel = require('./baseModel');
+const bcrypt = require('bcrypt-nodejs');
+const query  = require('./_Query');
+const uuidv4 = require('uuid/v4');
 
-/**
- * This constructor function is responsible for running queries against
- * the mysql database
- */
 function Users() {
-  BaseModel.call(this);
-
-  let columnNames = [
-    'user_id',
-    'first_name',
-    'last_name',
-    'upassword',
-    'email',
-    'birthday',
-    'roles',
-    'created_at',
-    'updated_at',
-  ];
-
-  /**
-   *
-   * @param {string} userId
-   * @return {Promise}
-   */
   this.deleteUser = function(userId) {
     let query = 'DELETE FROM users WHERE user_id = ?';
     return this.runQuery(query, [ userId, ])
@@ -47,7 +25,7 @@ function Users() {
   };
 
   this.getUser = function(sql, params) {
-    return this.runQuery(sql, params)
+    return query(sql, params)
       .then((results) => {
         if (results.resultSet.length === 0) {
           return {
@@ -57,23 +35,17 @@ function Users() {
           };
         }
 
-        let rs = [];
-        results.resultSet.forEach((element) => {
-          let record = { ...element, };
-          rs.push(record);
-        });
-
-        // return our result to the calling method
         return {
           success: true,
           message: 'success',
-          results: rs,
+          results: results.resultSet,
         };
       })
       .catch(() => {
         return {
           success: false,
           message: 'Error Occurred Finding User',
+          results: [],
         };
       });
   };
@@ -95,35 +67,18 @@ function Users() {
     'birthday, roles as role FROM users';
 
     if (id !== '') {
-      sql += ' WHERE user_id = ?';
+      sql += ' WHERE user_id = :user_id';
     }
 
-    return this.getUser(sql, [ id, ]);
+    return this.getUser(sql, {user_id: id});
   };
 
-  /**
-   * Inserts a user into the database
-   */
-  this.addUser = function(postParams) {
-    let parent = this;
+  
+  this.addUser = function(vals) {
+    vals['upassword'] = bcrypt.hashSync(vals.upassword);
 
-    let insertValues = [
-      postParams.user_id,
-      postParams.first_name,
-      postParams.last_name,
-      bcrypt.hashSync(postParams.upassword),
-      postParams.email,
-      postParams.birthday,
-      postParams.roles,
-      postParams.created_at,
-      postParams.updated_at,
-    ];
-
-    // use promises to handle all callbacks.
-    return this.isEmailUnique(postParams.email)
+    return this.isEmailUnique(vals['email'])
       .then((emailResults) => {
-        // console.log('email results: ', emailResults);
-
         let found = emailResults.resultSet[0].found;
 
         if (found === 1) {
@@ -131,7 +86,7 @@ function Users() {
           throw new Error('user already registered');
         }
 
-        return this.isUuidUnique(insertValues[0]);
+        return this.isUuidUnique(vals['user_id']);
       })
       .then(uuidResults => {
         let found = uuidResults.resultSet[0].found;
@@ -139,29 +94,22 @@ function Users() {
           throw new Error('Error Assigning ID');
         }
 
-        // go through the insert values and see they match up to the columns
-        // create our insert query & insert array
-        let sql = 'INSERT INTO users (user_id, first_name, last_name, ' +
-        'upassword, email, birthday, roles, created_at, updated_at) ' +
-        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        let sql = `
+INSERT INTO users (user_id, first_name, last_name, upassword, email, birthday, roles)
+VALUES (:user_id, :first_name, :last_name, :upassword, :email, :birthday, :roles)`;
 
-        return parent.runQuery(sql, insertValues);
+        return query(sql, vals);
       })
       .then(results => {
         // return an object to our calling method:
         return {
           success: true,
-          results: [ insertValues[0], ],
+          results: [ vals['user_id'] ],
         };
       })
       .catch(error => {
         console.log('EXCEPTION OCCURRED - ADDING USER', error);
-        return error;
-        // return {
-        //   success: false,
-        //   message: 'Error Occurred Adding User',
-        //   results: [],
-        // };
+        throw error;
       });
   };
 
@@ -237,15 +185,15 @@ function Users() {
   };
 
   this.isEmailUnique = function(email) {
-    let sql = 'SELECT COUNT(*) AS found FROM users WHERE email = ?';
+    let sql = 'SELECT COUNT(*) AS found FROM users WHERE email = :email';
 
-    return this.runQuery(sql, [ email, ]);
+    return query(sql, { email });
   };
 
   this.isUuidUnique = function(uuid) {
-    let sql = 'SELECT COUNT(*) AS found FROM users WHERE user_id = ?';
+    let sql = 'SELECT COUNT(*) AS found FROM users WHERE user_id = :user_id';
 
-    return this.runQuery(sql, [ uuid, ]);
+    return query(sql, { user_id: uuid });
   };
 
   this.getColumnNames = function() {

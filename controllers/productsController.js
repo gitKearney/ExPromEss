@@ -4,11 +4,6 @@ function ProductsController(authService, productService)
   this.productService = productService;
   this.authService = authService;
 
-  /**
-   *
-   * @param {Object} request
-   * @return {Promise}
-   */
   this.get = function(request)
   {
     let page = 1;

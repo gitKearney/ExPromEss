@@ -1,4 +1,4 @@
-let di = require('../ioc/Container');
+let di = require('../factory/Container');
 
 module.exports = function(express)
 {

@@ -1,27 +1,17 @@
-const di = require('../ioc/Container');
+const { Router } = require('express');
+const UserController = require('../controllers/userController');
 
-module.exports = function UserRouter(express) {
-  // create a router for user URIs
-  let userRouter = express.Router();
+const {createUserController} = require('../factory/Container');
 
-  /* middleware section */
-  userRouter.use(express.urlencoded({ extended: true, inflate: true, }));
-  userRouter.use(express.json({ inflate: true, }));
+function createUserRouter(express) {
+  /** @type {Router} */
+  let userRouter = Router();
 
-  /* routes section */
+  /** @type {UserController} */
+  let userController = createUserController();
 
-  /**
-   * this corresponds to GET http://example.com/users
-   *
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {string} JSON data stringify
-   */
   userRouter.delete('/:uuid', function(request, response) {
-    let userController = di.createUserController();
-
-    // userController.get() returns a new promise object
-    userController.delete(request)
+    userController.delete(request.params)
       .then((res) => {
         console.log('resolving:', res);
         response.send(res);
@@ -33,18 +23,9 @@ module.exports = function UserRouter(express) {
       });
   });
 
-  /**
-   * this corresponds to GET http://example.com/users
-   *
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {string} JSON data stringify
-   */
+  
   userRouter.get('/:uuid', function(request, response) {
-    let userController = di.createUserController();
-
-    // userController.get() returns a new promise object
-    userController.get(request)
+    userController.get(request.params)
       .then((res) => {
         response.send(res);
       })
@@ -53,18 +34,8 @@ module.exports = function UserRouter(express) {
       });
   });
 
-  /**
-   * this corresponds to GET http://example.com/users
-   *
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {string} JSON data stringify
-   */
   userRouter.get('/', function(request, response) {
-    let userController = di.createUserController();
-
-    // userController.get() returns a new promise object
-    userController.get(request)
+    userController.get(request.params)
       .then((res) => {
         response.send(res);
       })
@@ -74,8 +45,7 @@ module.exports = function UserRouter(express) {
   });
 
   userRouter.patch('/:uuid', function(request, response) {
-    let userController = di.createUserController();
-
+    // TODO: pass in UUID & body
     userController.patch(request)
       .then(res => {
         response.send(res);
@@ -85,28 +55,19 @@ module.exports = function UserRouter(express) {
       });
   });
 
-  /**
-   * this corresponds to POST http://example.com/users
-   *
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {string} JSON data stringify
-   */
   userRouter.post('/', function(request, response) {
-    let userController = di.createUserController();
-
-    userController.post(request, response)
+    userController.post(request.body)
       .then((res) => {
+        console.log('RES (GOOD)', res);
         response.send(res);
       })
       .catch((err) => {
-        response.send(err);
+        console.log('RES (ERROR)', err.message);
+        response.send({success: false, message: err.message});
       });
   });
 
   userRouter.put('/', function(request, response) {
-    let userController = di.createUserController();
-
     userController.put(request)
       .then(res => {
         response.send(res);
@@ -118,3 +79,5 @@ module.exports = function UserRouter(express) {
 
   return userRouter;
 };
+
+module.exports = createUserRouter;

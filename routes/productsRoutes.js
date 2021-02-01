@@ -1,15 +1,9 @@
-const di = require('../ioc/Container');
+const di = require('../factory/Container');
 
 module.exports = function ProductRouter(express)
 {
   // create a router for user URIs
   let productsRouter = express.Router();
-
-  /* middleware section */
-  // we won't be doing anything with HTTP bodies in this route, so disable
-  // middleware related to reading body
-
-  /* routes section */
 
   /**
    * Return info about a single product

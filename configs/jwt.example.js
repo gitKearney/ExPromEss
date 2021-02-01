@@ -1,8 +1,4 @@
-/**
- * Example config file to hold JWT information
- * @type {{jwt: {audience: string, issuer: string, expire: number, secret: string}}}
- */
-module.exports = {
+const JwtCredentials = {
   // TODO: put contents of this file in new file called jwt.js. DO NOT COMMIT jwt.js
   jwt: {
     audience: 'http://example.com',
@@ -14,5 +10,6 @@ module.exports = {
   },
   // for testing if you don't want to have auth, you can turn it off
   disable_auth: false,
-}
+};
 
+module.exports = JwtCredentials;

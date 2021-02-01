@@ -1,0 +1,6 @@
+CREATE USER 'demo_superuser'@'%' IDENTIFIED BY 'super_secret';
+
+GRANT ALTER, CREATE, DELETE, DROP, INDEX, INSERT, REFERENCES, SELECT, UPDATE
+ON demo.* to 'demo_superuser'@'%';
+
+FLUSH PRIVILEGES;

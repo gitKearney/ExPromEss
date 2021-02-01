@@ -1,24 +1,18 @@
-const di = require('../ioc/Container');
+const {createProductController} = require('../factory/Container');
 
 function ProductRouter(express) {
   // create a router for user URIs
   let productRouter = express.Router();
 
-  /* middleware section */
-  productRouter.use(express.urlencoded({ extended: true, inflate: true, }));
-  productRouter.use(express.json({ inflate: true, }));
-
-  /* routes section */
-
   /**
    * this corresponds to GET http://example.com/users
    *
-   * @param {Object} request
-   * @param {Object} response
+   * @param {Request} request
+   * @param {Response} response
    * @returns {string} JSON data stringify
    */
   productRouter.delete('/:uuid', function(request, response) {
-    let productController = di.createProductController();
+    let productController = createProductController();
 
     productController.delete(request)
       .then((res) => {
@@ -38,7 +32,7 @@ function ProductRouter(express) {
    */
   productRouter.get('/:uuid', function(request, response)
   {
-    let productController = di.createProductController();
+    let productController = createProductController();
 
     // productController.get() returns a new promise object
     productController.get(request)
@@ -62,7 +56,7 @@ function ProductRouter(express) {
    */
   productRouter.patch('/:uuid', function(request, response)
   {
-    let productController = di.createProductController();
+    let productController = createProductController();
 
     productController.patch(request)
     .then(res => {
