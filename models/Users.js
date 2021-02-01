@@ -56,10 +56,11 @@ function Users() {
    * @return {Promise}
    */
   this.getUserByEmail = function(email) {
-    let sql = 'SELECT user_id, first_name, last_name, upassword, email, ' +
-    'birthday, roles as role FROM users WHERE email = ?';
+    let sql = `
+SELECT user_id, first_name, last_name, upassword, email,
+birthday, roles as role FROM users WHERE email = :email`;
 
-    return this.getUser(sql, [ email, ]);
+    return this.getUser(sql, { email });
   };
 
   this.getUserById = function(id) {

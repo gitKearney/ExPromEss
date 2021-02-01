@@ -2,52 +2,45 @@ let bcrypt      = require('bcrypt-nodejs');
 let jwt         = require('jsonwebtoken');
 let appConfigs  = require('../configs/jwt.example');
 const MyError   = require('../errors/BaseError');
+const Users = require('../models/Users');
 
+/**
+ * 
+ * @param {Users} user 
+ */
 function AuthService(user) {
-  this.authenticate = function(params) {
-    let userInfo = {};
-    let userRes = {};
+  const info = {email: '', user_id: ''};
 
-    let checkBody = new Promise((resolve, reject) => {
-      if (appConfigs.disable_auth) {
-        resolve(true);
-      }
-
-      if (!params.hasOwnProperty('password') || !params.hasOwnProperty('email')) {
-        let e = new MyError('Invalid Body');
-        reject(e);
-      }
-
-      resolve(true);
-    });
-
-    return checkBody
-      .then(() => {
-        return user.getUserByEmail(params.email);
-      })
-      .then(result => {
-        if (result.success === false) {
-          let e = new MyError('Incorrect email password combination');
-          throw e;
+  this.authenticate = function(body) {
+    if (!body.hasOwnProperty('password') || !body.hasOwnProperty('email')) {
+      throw new Error('Invalid Post Values');
+    }
+  
+    return user.getUserByEmail(body.email)
+      .then(res => {
+        if (!res.success) {
+          throw new Error('Invalid Email');
         }
 
-        userRes = result.results[0];
-        userInfo.email = userRes.email;
-        userInfo.user_id = userRes.user_id;
+        const email = res.results[0]['email'];
+        const passwd = res.results[0]['upassword'];
+        const userId = res.results[0]['user_id'];
 
-        // verify the password
-        return this.verifyPassword(params.password, userRes.upassword);
+        info['email'] = email;
+        info['user_id'] = userId;
+
+        return this.verifyPassword(body.password, passwd);
       })
-      .then(() => {
+      .then(_ => {
         let currentTime = Math.floor(Date.now() / 1000);
 
-        // start building a JWT
+        // create a JWT token
         let tokenData = {
-        // audience: JWT's audience
+          // audience: JWT's audience
           aud: appConfigs.jwt.audience,
 
           // data is our user's info
-          data: userInfo,
+          data: info,
 
           // expiresIn is how many seconds till this token expires
           exp: currentTime + (60 * appConfigs.jwt.expire),
@@ -63,23 +56,13 @@ function AuthService(user) {
         };
 
         let token =  jwt.sign(tokenData, appConfigs.jwt.secret);
-
         return {
           success: true,
           message: 'success',
-          results: {
-            token: token,
-            email: userRes.email,
-            firstName: userRes.first_name,
-            lastName: userRes.last_name,
-            userNumber: userRes.user_id,
-          },
+          results: token,
         };
-      })
-      .catch(error => {
-        return error;
       });
-  };
+  }
 
   /**
    *
@@ -95,11 +78,10 @@ function AuthService(user) {
         }
 
         if (err) {
-          reject(new MyError(err.message));
+          reject({success: false, message: err.message});
         }
-
-        let e = new MyError('Invalid Password Combo');
-        reject(e);
+        
+        reject({success: false, message: 'Invalid Password Combo'});
       });
     });
   };

@@ -1,17 +1,12 @@
+const AuthService = require("../services/authService");
+
 /**
  * Verifies POST password and returns an error or JWT
- * @param {authService} authService
+ * @param {AuthService} authService
  */
 function AuthController(authService) {
   this.post = function(request) {
-    return authService.authenticate(request.body)
-      .then(result => {
-        return result;
-      })
-      .catch(error => {
-        console.log('authController.caught error', error);
-        return error;
-      });
+    return authService.authenticate(request.body);
   };
 }
 
