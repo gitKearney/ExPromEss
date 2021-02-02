@@ -1,11 +1,10 @@
 const bcrypt = require('bcrypt-nodejs');
 const query  = require('./_Query');
-const uuidv4 = require('uuid/v4');
 
 function Users() {
   this.deleteUser = function(userId) {
-    let query = 'DELETE FROM users WHERE user_id = ?';
-    return this.runQuery(query, [ userId, ])
+    let sql = 'DELETE FROM users WHERE user_id = :user_id';
+    return query(sql, { userId, })
       .then(results => {
         let success = results.resultSet.affectedRows === 1;
 
@@ -60,7 +59,7 @@ function Users() {
 SELECT user_id, first_name, last_name, upassword, email,
 birthday, roles as role FROM users WHERE email = :email`;
 
-    return this.getUser(sql, { email });
+    return this.getUser(sql, { email, });
   };
 
   this.getUserById = function(id) {
@@ -71,10 +70,9 @@ birthday, roles as role FROM users WHERE email = :email`;
       sql += ' WHERE user_id = :user_id';
     }
 
-    return this.getUser(sql, {user_id: id});
+    return this.getUser(sql, { user_id: id, });
   };
 
-  
   this.addUser = function(vals) {
     vals['upassword'] = bcrypt.hashSync(vals.upassword);
 
@@ -105,7 +103,7 @@ VALUES (:user_id, :first_name, :last_name, :upassword, :email, :birthday, :roles
         // return an object to our calling method:
         return {
           success: true,
-          results: [ vals['user_id'] ],
+          results: [ vals['user_id'], ],
         };
       })
       .catch(error => {
@@ -188,17 +186,13 @@ VALUES (:user_id, :first_name, :last_name, :upassword, :email, :birthday, :roles
   this.isEmailUnique = function(email) {
     let sql = 'SELECT COUNT(*) AS found FROM users WHERE email = :email';
 
-    return query(sql, { email });
+    return query(sql, { email, });
   };
 
   this.isUuidUnique = function(uuid) {
     let sql = 'SELECT COUNT(*) AS found FROM users WHERE user_id = :user_id';
 
-    return query(sql, { user_id: uuid });
-  };
-
-  this.getColumnNames = function() {
-    return columnNames;
+    return query(sql, { user_id: uuid, });
   };
 }
 

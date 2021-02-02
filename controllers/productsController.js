@@ -1,11 +1,9 @@
 
-function ProductsController(authService, productService)
-{
+function ProductsController(authService, productService) {
   this.productService = productService;
   this.authService = authService;
 
-  this.get = function(request)
-  {
+  this.get = function(request) {
     let page = 1;
     if (request.params.hasOwnProperty('page')) {
       page = parseInt(request.params.page);
@@ -13,10 +11,9 @@ function ProductsController(authService, productService)
 
     return this.authService.decodeJwt(request.headers)
       .then((decodedJwt) => {
-
-        let userInfo = {...{},
+        let userInfo = { ...{},
           user_id: decodedJwt.data.user_id,
-          email: decodedJwt.data.email
+          email: decodedJwt.data.email,
         };
 
         return this.productService.getPaginatedData(page);
@@ -28,7 +25,6 @@ function ProductsController(authService, productService)
         return error;
       });
   };
-
 }
 
-module.exports =  ProductsController;
+module.exports = ProductsController;

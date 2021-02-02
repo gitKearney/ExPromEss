@@ -1,5 +1,3 @@
-let uuidv4  = require('uuid/v4');
-
 function ProductService(productModel, timeService) {
   this.productModel = productModel;
 
@@ -13,23 +11,11 @@ function ProductService(productModel, timeService) {
    * @returns {Promise<T>}
    */
   this.handleGet = function(productId) {
-    return productModel.getProductById(productId)
-      .then((data) => {
-        return data;
-      })
-      .catch((err) => {
-        throw err;
-      });
+    return productModel.getProductById(productId);
   };
 
   this.getPaginatedData = function(page) {
-    return productModel.getProductsByPage(page)
-      .then((data) => {
-        return data;
-      })
-      .catch((err) => {
-        throw err;
-      });
+    return productModel.getProductsByPage(page);
   };
 
   /**

@@ -1,7 +1,5 @@
-const AuthService = require("../services/authService");
-
 /**
- * Verifies POST password and returns an error or JWT
+ * @desc Verifies POST password and returns an error or JWT
  * @param {AuthService} authService
  */
 function AuthController(authService) {

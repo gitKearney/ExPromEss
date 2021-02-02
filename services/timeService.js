@@ -5,7 +5,7 @@ function TimeService() {
   /**
    * change the current time
    * @param {Date} someTime
-   * @return TimeService
+   * @return {TimeService}
    */
   this.setCurrentTime = function(someTime) {
     current = someTime;
@@ -13,11 +13,12 @@ function TimeService() {
   };
 
   /**
-   *
    * @returns {string}
    */
   this.makeMySQLDatetime = function() {
-    // console.log('current is', current);
+    if (!current) {
+      current = new Date();
+    }
 
     let year    = current.getFullYear();
     let month   = current.getMonth() + 1;

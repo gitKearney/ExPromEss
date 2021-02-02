@@ -55,7 +55,7 @@ function UserService(users, timeService) {
     };
 
     return insertValues;
-  }
+  };
 }
 
 module.exports = UserService;

@@ -18,7 +18,7 @@ function allowCors(request, response, next) {
 
   next();
 }
-  
+
 function logRequest(request, response, next) {
   let ctime = printDate();
   let url = request.originalUrl;
@@ -27,7 +27,7 @@ function logRequest(request, response, next) {
 
   next();
 }
-  
+
 // SETUP MIDDLEWARE
 app.use(
   [allowCors, logRequest],

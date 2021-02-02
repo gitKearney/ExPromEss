@@ -2,20 +2,22 @@ let bcrypt      = require('bcrypt-nodejs');
 let jwt         = require('jsonwebtoken');
 let appConfigs  = require('../configs/jwt.example');
 const MyError   = require('../errors/BaseError');
-const Users = require('../models/Users');
 
 /**
- * 
- * @param {Users} user 
+ * @param {Users} user
+ * @constructor
  */
 function AuthService(user) {
-  const info = {email: '', user_id: ''};
+  const info = { email: '', user_id: '', };
 
   this.authenticate = function(body) {
-    if (!body.hasOwnProperty('password') || !body.hasOwnProperty('email')) {
+
+    if (!Object.prototype.hasOwnProperty.call(body, 'password') ||
+        !Object.prototype.hasOwnProperty.call(body, 'email'))
+    {
       throw new Error('Invalid Post Values');
     }
-  
+
     return user.getUserByEmail(body.email)
       .then(res => {
         if (!res.success) {
@@ -31,7 +33,7 @@ function AuthService(user) {
 
         return this.verifyPassword(body.password, passwd);
       })
-      .then(_ => {
+      .then(() => {
         let currentTime = Math.floor(Date.now() / 1000);
 
         // create a JWT token
@@ -62,7 +64,7 @@ function AuthService(user) {
           results: token,
         };
       });
-  }
+  };
 
   /**
    *
@@ -78,10 +80,10 @@ function AuthService(user) {
         }
 
         if (err) {
-          reject({success: false, message: err.message});
+          reject(err);
         }
-        
-        reject({success: false, message: 'Invalid Password Combo'});
+
+        reject(new Error('Invalid Password Combo'));
       });
     });
   };
@@ -93,7 +95,7 @@ function AuthService(user) {
    */
   this.decodeJwt = function(headers) {
     return new Promise((resolve, reject) => {
-      if (headers.hasOwnProperty('authorization') === false) {
+      if (!Object.prototype.hasOwnProperty.call(headers,'authorization')) {
         reject(new MyError('Access Denied'));
       }
 

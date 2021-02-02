@@ -1,12 +1,8 @@
-const AuthService = require("../services/authService");
-const UserService = require("../services/userService");
-
 /**
- * @param {AuthService} authService 
- * @param {UserService} userService 
+ * @param {AuthService} authService
+ * @param {UserService} userService
  */
 function UserController(authService, userService) {
-
   // TODO: pass in request
   this.get = function(params) {
     // TODO: get request.get("Authorization")

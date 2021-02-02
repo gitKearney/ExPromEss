@@ -1,16 +1,11 @@
 {
   "env": {
-    "commonjs": true,
     "es6": true,
     "node": true
   },
-  "extends": "standard",
-  "globals": {
-    "Atomics": "readonly",
-    "SharedArrayBuffer": "readonly"
-  },
+  "extends": "eslint:recommended",
   "parserOptions": {
-    "ecmaVersion": 2018
+    "ecmaVersion": 2020
   },
   "rules": {
     "array-bracket-spacing": ["error", "always"],

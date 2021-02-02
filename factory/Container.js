@@ -15,16 +15,27 @@ let ProductController  = require('../controllers/productController');
 const ProductsController = require('../controllers/productsController');
 
 const container = {
-  /** MODELS */
+  // *** MODELS ***
+
+  /**
+   * @returns {Product}
+   */
   productModel: function() {
     return new ProductModel();
   },
 
+  /**
+   * @returns {Users}
+   */
   userModel: function() {
     return new UserModel();
   },
 
-  /** SERVICES */
+  // *** SERVICES ***
+
+  /**
+   * @returns {AuthService}
+   */
   authService: function() {
     let userModel = this.userModel();
     return new AuthService(userModel);
@@ -39,7 +50,7 @@ const container = {
     let timeService = this.timeService();
     return new ProductService(productModel, timeService);
   },
-  
+
   userService: function() {
     let user = this.userModel();
     let timeService = this.timeService();
