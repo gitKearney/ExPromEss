@@ -4,13 +4,13 @@ function query(sql, params) {
   const executor = (resolve, reject) => {
     pool.getConnection((err, connection) => {
       if (err) {
-        reject('failed to establish connection');
+        reject(new Error('failed to establish connection'));
       }
 
       connection.config.queryFormat = function(query, values) {
         if (!values) return query;
         return query.replace(/:(\w+)/g, function(txt, key) {
-          if (values.hasOwnProperty(key)) {
+          if (Object.prototype.hasOwnProperty.call(values, key)) {
             return this.escape(values[key]);
           }
           return txt;
@@ -21,8 +21,7 @@ function query(sql, params) {
         connection.release();
 
         if (error) {
-          console.log('error running query:', error);
-          reject('error with query');
+          reject(new Error('error with query'));
           return;
         }
 
@@ -32,6 +31,6 @@ function query(sql, params) {
   };
 
   return new Promise(executor);
-};
+}
 
 module.exports = query;

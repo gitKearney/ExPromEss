@@ -1,6 +1,6 @@
 /** * IMPORT MODELS ***/
-let UserModel      = require('../models/Users');
-let ProductModel   = require('../models/product');
+let Users      = require('../models/Users');
+let Products   = require('../models/Products');
 
 /** * IMPORT SERVICES ***/
 let AuthService    = require('../services/authService');
@@ -9,26 +9,26 @@ let UserService    = require('../services/userService');
 let ProductService = require('../services/productService');
 
 /** * IMPORT CONTROLLERS ***/
-let AuthController     = require('../controllers/authController');
-let UserController     = require('../controllers/userController');
-let ProductController  = require('../controllers/productController');
-const ProductsController = require('../controllers/productsController');
+let AuthController     = require('../controllers/AuthController');
+let UserController     = require('../controllers/UserController');
+let ProductController  = require('../controllers/ProductController');
+const ProductsController = require('../controllers/ProductsController');
 
 const container = {
   // *** MODELS ***
 
   /**
-   * @returns {Product}
+   * @returns {Products}
    */
   productModel: function() {
-    return new ProductModel();
+    return new Products();
   },
 
   /**
    * @returns {Users}
    */
   userModel: function() {
-    return new UserModel();
+    return new Users();
   },
 
   // *** SERVICES ***
@@ -41,40 +41,56 @@ const container = {
     return new AuthService(userModel);
   },
 
+  /** @return {TimeService} */
   timeService: function() {
     return new TimeService();
   },
 
+  /** @return {ProductService} */
   productService: function() {
     let productModel = this.productModel();
     let timeService = this.timeService();
     return new ProductService(productModel, timeService);
   },
 
+  /** @return {UserService} */
   userService: function() {
     let user = this.userModel();
     let timeService = this.timeService();
     return new UserService(user, timeService);
   },
 
-  /** CONTROLLERS */
+  // *** CONTROLLERS ***
+
+  /**
+   * @return {UserController}
+   */
   userController: function() {
     let authService = this.authService();
     let userService = this.userService();
     return new UserController(authService, userService);
   },
 
+  /**
+   * @return {AuthController}
+   */
   authController: function() {
     let authService = this.authService();
     return new AuthController(authService);
   },
 
+  /**
+   * @return {ProductController}
+   */
   productController: function() {
     let authService = this.authService();
     let productService = this.productService();
     return new ProductController(authService, productService);
   },
 
+  /**
+   * @return {ProductsController}
+   */
   productsController: function() {
     let authService = this.authService();
     let productService = this.productService();
@@ -83,19 +99,30 @@ const container = {
 };
 
 module.exports = {
+  /**
+   * @return {UserController}
+   */
   createUserController: function() {
-    // create our user controller, inject its dependencies into it
     return container.userController();
   },
 
+  /**
+   * @return {AuthController}
+   */
   createAuthController: function() {
     return container.authController();
   },
 
+  /**
+   * @return {ProductController}
+   */
   createProductController: function() {
     return container.productController();
   },
 
+  /**
+   * @return {ProductsController}
+   */
   createProductsContainer: function() {
     return container.productsController();
   },

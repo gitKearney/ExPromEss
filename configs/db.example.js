@@ -1,10 +1,11 @@
 const mariaCredentials = {
   connectionLimit : 5,
   host            : '127.0.0.1',
-  port            : '3306',
+  port            : '3366',
   user            : 'demo_superuser',
   password        : 'super_secret',
-  database        : 'demo'
-}
+  database        : 'demo',
+};
 
-module.exports = mariaCredentials
+module.exports = mariaCredentials;
+

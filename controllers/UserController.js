@@ -1,13 +1,9 @@
-/**
- * @param {AuthService} authService
- * @param {UserService} userService
- */
 function UserController(authService, userService) {
   // TODO: pass in request
   this.get = function(params) {
     // TODO: get request.get("Authorization")
     let userId = '';
-    if (params.hasOwnProperty('uuid')) {
+    if (Object.prototype.hasOwnProperty.call(params,'uuid')) {
       userId = params.uuid;
     }
 

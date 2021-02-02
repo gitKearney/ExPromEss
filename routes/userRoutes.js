@@ -1,13 +1,11 @@
-const { Router } = require('express');
-const UserController = require('../controllers/userController');
+const { Router, } = require('express');
 
 const {createUserController} = require('../factory/Container');
 
-function createUserRouter(express) {
+function createUserRouter() {
   /** @type {Router} */
   let userRouter = Router();
 
-  /** @type {UserController} */
   let userController = createUserController();
 
   userRouter.delete('/:uuid', function(request, response) {
@@ -19,18 +17,18 @@ function createUserRouter(express) {
       .catch(err => {
         console.log('rejecting:', err);
 
-        response.send(err);
+        response.send({ success: false, messaage: err.message, });
       });
   });
 
-  
+
   userRouter.get('/:uuid', function(request, response) {
     userController.get(request.params)
       .then((res) => {
         response.send(res);
       })
       .catch(err => {
-        response.send(err);
+        response.send({ success: false, messaage: err.message, });
       });
   });
 
@@ -40,7 +38,7 @@ function createUserRouter(express) {
         response.send(res);
       })
       .catch(err => {
-        response.send(err);
+        response.send({ success: false, messaage: err.message, });
       });
   });
 
@@ -50,8 +48,8 @@ function createUserRouter(express) {
       .then(res => {
         response.send(res);
       })
-      .catch(() => {
-        response.send(false);
+      .catch((err) => {
+        response.send({ success: false, messaage: err.message, });
       });
   });
 
@@ -72,12 +70,12 @@ function createUserRouter(express) {
       .then(res => {
         response.send(res);
       })
-      .catch(() => {
-        response.send(false);
+      .catch((err) => {
+        response.send({ success: false, message: err.message, });
       });
   });
 
   return userRouter;
-};
+}
 
 module.exports = createUserRouter;

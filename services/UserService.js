@@ -1,25 +1,21 @@
 let uuidv4  = require('uuid/v4');
-const bcrypt = require('bcrypt-nodejs');
-
-const Users = require('../models/Users');
-const TimeService = require('./timeService');
 
 /**
- * 
- * @param {Users} users 
- * @param {TimeService} timeService 
+ *
+ * @param {Users} users
+ * @param {TimeService} timeService
  */
-function UserService(users, timeService) {
+function UserService(users) {
 
   this.handleDelete = function(userId) {
-    return userModel.deleteUser(userId);
+    return users.deleteUser(userId);
   };
 
   this.handleGet = function(userId) {
-    // TODO: does requestor have access to this user's info?
+    // TODO: does requester have access to this user's info?
     return users.getUserById(userId)
       .then((data) => {
-        // don't expose the password,
+        // don't expose the password
         if (data.success === true) {
           data.results.forEach(element => delete(element.upassword));
         }
@@ -43,7 +39,7 @@ function UserService(users, timeService) {
 
   this.verifyPostParams = function(params) {
     params.user_id = uuidv4();
-    
+
     let insertValues = {
       'user_id':    params.user_id ?? null,
       'first_name': params.first_name ?? null,

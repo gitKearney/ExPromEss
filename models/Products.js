@@ -4,7 +4,7 @@ const uuidv4  = require('uuid/v4');
  * Represents a product
  * @constructor
  */
-function Product() {
+function Products() {
   let columnNames = [
     'product_id',
     'title',
@@ -45,7 +45,7 @@ function Product() {
         console.log('EXCEPTION OCCURRED SELECTING: ', error);
         return {
           success: false,
-          message: 'Error Occurred Finding Product',
+          message: 'Error Occurred Finding Products',
         };
       });
   };
@@ -88,7 +88,7 @@ function Product() {
         console.log('EXCEPTION OCCURRED SELECTING: ', error);
         return {
           success: false,
-          message: 'Error Occurred Finding Product',
+          message: 'Error Occurred Finding Products',
         };
       });
   };
@@ -150,7 +150,7 @@ function Product() {
         return {
           results: '',
           success: false,
-          message: 'Error Adding New Product',
+          message: 'Error Adding New Products',
         };
       });
   };
@@ -195,7 +195,7 @@ function Product() {
 
         return {
           success: updated,
-          message: updated ? 'Success' : 'No Product Found',
+          message: updated ? 'Success' : 'No Products Found',
         };
       })
       .catch(error => {
@@ -223,7 +223,7 @@ function Product() {
 
         return {
           success: updated,
-          message: updated ? 'Success' : 'No Product Found',
+          message: updated ? 'Success' : 'No Products Found',
         };
       })
       .catch(error => {
@@ -231,7 +231,7 @@ function Product() {
 
         return {
           success: false,
-          message: 'Error Occurred Removing Product',
+          message: 'Error Occurred Removing Products',
         };
       });
   };
@@ -247,4 +247,4 @@ function Product() {
   };
 }
 
-module.exports = Product;
+module.exports = Products;

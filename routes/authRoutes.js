@@ -1,13 +1,10 @@
-const AuthController = require('../controllers/authController');
-let { createAuthController } = require('../factory/Container');
+let { createAuthController, } = require('../factory/Container');
 
 module.exports = function(express)
 {
   let authRouter = express.Router();
 
-  authRouter.post('/', function(request, response)
-  {
-    /** @type {AuthController} */
+  authRouter.post('/', function(request, response) {
     let authController = createAuthController();
 
     authController.post(request)
@@ -15,7 +12,7 @@ module.exports = function(express)
       response.send(res);
     })
     .catch((err) => {
-      response.send({success: false, message: err.message});
+      response.send({ success: false, message: err.message, });
     });
   });
 

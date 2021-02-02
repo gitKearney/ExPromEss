@@ -1,32 +1,22 @@
 let bcrypt      = require('bcrypt-nodejs');
 let jwt         = require('jsonwebtoken');
 let appConfigs  = require('../configs/jwt.example');
-const MyError   = require('../errors/BaseError');
 
-/**
- * @param {Users} user
- * @constructor
- */
 function AuthService(user) {
   const info = { email: '', user_id: '', };
 
   this.authenticate = function(body) {
-
     if (!Object.prototype.hasOwnProperty.call(body, 'password') ||
         !Object.prototype.hasOwnProperty.call(body, 'email'))
     {
-      throw new Error('Invalid Post Values');
+      throw new Error('BAD REQUEST');
     }
 
     return user.getUserByEmail(body.email)
-      .then(res => {
-        if (!res.success) {
-          throw new Error('Invalid Email');
-        }
-
-        const email = res.results[0]['email'];
-        const passwd = res.results[0]['upassword'];
-        const userId = res.results[0]['user_id'];
+      .then((rdp) => {
+        const email = rdp[0]['email'];
+        const passwd = rdp[0]['upassword'];
+        const userId = rdp[0]['user_id'];
 
         info['email'] = email;
         info['user_id'] = userId;
@@ -66,21 +56,16 @@ function AuthService(user) {
       });
   };
 
-  /**
-   *
-   * @param {string} postPassword
-   * @param {string} userPassword
-   * @returns {Promise<any>}
-   */
   this.verifyPassword = function(postPassword, userPassword) {
     return new Promise((resolve, reject) => {
       bcrypt.compare(postPassword, userPassword, (err, result) => {
-        if (result === true) {
-          resolve(true);
-        }
-
         if (err) {
           reject(err);
+        }
+
+        if (result) {
+          resolve(true);
+          return;
         }
 
         reject(new Error('Invalid Password Combo'));
@@ -88,21 +73,18 @@ function AuthService(user) {
     });
   };
 
-  /**
-   *
-   * @param {Object} headers
-   * @returns {Promise}
-   */
   this.decodeJwt = function(headers) {
     return new Promise((resolve, reject) => {
       if (!Object.prototype.hasOwnProperty.call(headers,'authorization')) {
-        reject(new MyError('Access Denied'));
+        reject(new Error('Access Denied'));
+        return;
       }
 
       let jsonToken = headers.authorization;
       jwt.verify(jsonToken, appConfigs.jwt.secret, (error, decoded) => {
         if (error) {
-          reject(new MyError('Access Denied'));
+          reject(new Error('Access Denied'));
+          return;
         }
 
         resolve(decoded);

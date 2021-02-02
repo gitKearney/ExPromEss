@@ -1,7 +1,3 @@
-/**
- * @desc Verifies POST password and returns an error or JWT
- * @param {AuthService} authService
- */
 function AuthController(authService) {
   this.post = function(request) {
     return authService.authenticate(request.body);

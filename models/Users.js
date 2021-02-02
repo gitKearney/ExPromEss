@@ -27,25 +27,10 @@ function Users() {
     return query(sql, params)
       .then((results) => {
         if (results.resultSet.length === 0) {
-          return {
-            message: 'No User Found',
-            success: false,
-            results: [],
-          };
+          throw new Error('Invalid User');
         }
 
-        return {
-          success: true,
-          message: 'success',
-          results: results.resultSet,
-        };
-      })
-      .catch(() => {
-        return {
-          success: false,
-          message: 'Error Occurred Finding User',
-          results: [],
-        };
+        return results.resultSet;
       });
   };
 
