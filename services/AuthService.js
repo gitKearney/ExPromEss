@@ -3,9 +3,10 @@ let jwt         = require('jsonwebtoken');
 let appConfigs  = require('../configs/jwt.example');
 
 function AuthService(user) {
-  const info = { email: '', user_id: '', };
 
-  this.authenticate = function(body) {
+  this.createToken = function(body) {
+    const info = { email: '', user_id: '', };
+
     if (!Object.prototype.hasOwnProperty.call(body, 'password') ||
         !Object.prototype.hasOwnProperty.call(body, 'email'))
     {
@@ -14,9 +15,9 @@ function AuthService(user) {
 
     return user.getUserByEmail(body.email)
       .then((rdp) => {
-        const email = rdp[0]['email'];
-        const passwd = rdp[0]['upassword'];
-        const userId = rdp[0]['user_id'];
+        const email = rdp['email'];
+        const passwd = rdp['upassword'];
+        const userId = rdp['user_id'];
 
         info['email'] = email;
         info['user_id'] = userId;
@@ -61,6 +62,7 @@ function AuthService(user) {
       bcrypt.compare(postPassword, userPassword, (err, result) => {
         if (err) {
           reject(err);
+          return;
         }
 
         if (result) {
@@ -73,15 +75,16 @@ function AuthService(user) {
     });
   };
 
-  this.decodeJwt = function(headers) {
+  this.authenticate = function(auth) {
     return new Promise((resolve, reject) => {
-      if (!Object.prototype.hasOwnProperty.call(headers,'authorization')) {
+      if (!auth) {
         reject(new Error('Access Denied'));
         return;
       }
 
-      let jsonToken = headers.authorization;
-      jwt.verify(jsonToken, appConfigs.jwt.secret, (error, decoded) => {
+      let bearer = auth.split(' ');
+      let token = bearer[1];
+      jwt.verify(token, appConfigs.jwt.secret, (error, decoded) => {
         if (error) {
           reject(new Error('Access Denied'));
           return;

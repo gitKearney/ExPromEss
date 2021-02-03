@@ -28,8 +28,8 @@ function UserService(users) {
       });
   };
 
-  this.handleUpdate = function(uuid, params) {
-    return users.updateUser(uuid, params);
+  this.handleUpdate = function(uuid, body) {
+    return users.updateUser(uuid, body);
   };
 
   this.handlePost = function(params) {
@@ -38,10 +38,8 @@ function UserService(users) {
   };
 
   this.verifyPostParams = function(params) {
-    params.user_id = uuidv4();
-
     let insertValues = {
-      'user_id':    params.user_id ?? null,
+      'user_id':    uuidv4(),
       'first_name': params.first_name ?? null,
       'last_name':  params.last_name ?? null,
       'upassword':  params.password ?? null,
@@ -51,6 +49,36 @@ function UserService(users) {
     };
 
     return insertValues;
+  };
+
+  /**
+   *
+   * @param {string} userId
+   * @param {string} requires
+   * @return {Promise<bool>}
+   */
+  this.canUserAccess = function(userId, requires) {
+    return users.getUserById(userId)
+      .then((rs) => {
+        if(rs['role'] === 'create') {
+          // this is the equivalent of admin
+          return true;
+        }
+
+        const needsEditPermission = requires === 'edit';
+        const hasEditPermission = rs['role'] === 'edit';
+        if (hasEditPermission && needsEditPermission) {
+          return true;
+        }
+
+        const needsReadPermission = requires === 'read';
+        if (hasEditPermission && needsReadPermission) {
+          return true;
+        }
+
+        const hasReadPermission = rs['role'] === 'read';
+        return (hasReadPermission && needsEditPermission);
+      });
   };
 }
 

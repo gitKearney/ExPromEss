@@ -1,19 +1,35 @@
+/**
+ *
+ * @param { AuthService } authService
+ * @param { UserService } userService
+ * @constructor
+ */
 function UserController(authService, userService) {
-  // TODO: pass in request
-  this.get = function(params) {
-    // TODO: get request.get("Authorization")
-    let userId = '';
-    if (Object.prototype.hasOwnProperty.call(params,'uuid')) {
-      userId = params.uuid;
-    }
 
-    return userService.handleGet(userId);
+  /**
+   *
+   * @param {string} uuid
+   * @param {string} authorization
+   * @return {*}
+   */
+  this.get = function(uuid, authorization) {
+    return authService.authenticate(authorization)
+      .then((user) => {
+        const requires = uuid === '' ? 'create' : 'edit';
+        return userService.canUserAccess(user.data['user_id'], requires);
+      })
+      .then((hasPermission) => {
+        if (!hasPermission) {
+          throw new Error('Permissions Denied');
+        }
+        return userService.handleGet(uuid);
+      });
   };
 
   this.delete = function(request) {
     let userId = request.params.uuid;
 
-    return authService.decodeJwt(request.headers)
+    return authService.authenticate(request.headers.get('authorization'))
       .then(decodedJwt => {
         // decodedJwt is an Object that contains email and user_id
         let userInfo = { ...{},
@@ -60,15 +76,7 @@ function UserController(authService, userService) {
     let uuid = request.body.id;
     let body = request.body;
 
-    return this.authService.decodeJwt(request.headers)
-      .then(decodedJwt => {
-        // let userInfo = { ...{},
-        //   user_id: decodedJwt.data.user_id,
-        //   email: decodedJwt.data.email,
-        // };
-
-        return this.userService.handleUpdate(uuid, body);
-      })
+    return userService.handleUpdate(uuid, body)
       .then(result => {
         return result;
       })

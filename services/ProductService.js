@@ -25,8 +25,6 @@ function ProductService(productModel, timeService) {
    * @return {Promise}
    */
   this.handleUpdate = function(uuid, params) {
-    params.updated_at = timeService.setCurrentTime(new Date()).makeMySQLDatetime();
-
     return productModel.updateProduct(uuid, params);
   };
 

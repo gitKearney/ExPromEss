@@ -1,9 +1,8 @@
 const { Router, } = require('express');
 
-const {createUserController} = require('../factory/Container');
+const { createUserController, } = require('../factory/Container');
 
 function createUserRouter() {
-  /** @type {Router} */
   let userRouter = Router();
 
   let userController = createUserController();
@@ -17,28 +16,29 @@ function createUserRouter() {
       .catch(err => {
         console.log('rejecting:', err);
 
-        response.send({ success: false, messaage: err.message, });
+        response.send({ success: false, message: err.message, });
       });
   });
 
-
   userRouter.get('/:uuid', function(request, response) {
-    userController.get(request.params)
+    const auth = request.get('authorization');
+    userController.get(request.params['uuid'], auth)
       .then((res) => {
         response.send(res);
       })
       .catch(err => {
-        response.send({ success: false, messaage: err.message, });
+        response.send({ success: false, message: err.message, });
       });
   });
 
   userRouter.get('/', function(request, response) {
-    userController.get(request.params)
+    const auth = request.get('authorization');
+    userController.get('', auth)
       .then((res) => {
         response.send(res);
       })
       .catch(err => {
-        response.send({ success: false, messaage: err.message, });
+        response.send({ success: false, message: err.message, });
       });
   });
 
@@ -49,7 +49,7 @@ function createUserRouter() {
         response.send(res);
       })
       .catch((err) => {
-        response.send({ success: false, messaage: err.message, });
+        response.send({ success: false, message: err.message, });
       });
   });
 
@@ -61,7 +61,7 @@ function createUserRouter() {
       })
       .catch((err) => {
         console.log('RES (ERROR)', err.message);
-        response.send({success: false, message: err.message});
+        response.send({success: false, message: err.message, });
       });
   });
 

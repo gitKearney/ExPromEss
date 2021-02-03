@@ -23,6 +23,12 @@ function Users() {
       });
   };
 
+  /**
+   *
+   * @param {string} sql
+   * @param {Object} params
+   * @return {Promise<[]>}
+   */
   this.getUser = function(sql, params) {
     return query(sql, params)
       .then((results) => {
@@ -30,14 +36,14 @@ function Users() {
           throw new Error('Invalid User');
         }
 
-        return results.resultSet;
+        return results.resultSet[0];
       });
   };
 
   /**
    *
    * @param {string} email
-   * @return {Promise}
+   * @return {Promise<*[]>}
    */
   this.getUserByEmail = function(email) {
     let sql = `
@@ -47,6 +53,11 @@ birthday, roles as role FROM users WHERE email = :email`;
     return this.getUser(sql, { email, });
   };
 
+  /**
+   *
+   * @param {string} id
+   * @return {Promise<*[]>}
+   */
   this.getUserById = function(id) {
     let sql = 'SELECT user_id, first_name, last_name, upassword, email, ' +
     'birthday, roles as role FROM users';
@@ -58,6 +69,11 @@ birthday, roles as role FROM users WHERE email = :email`;
     return this.getUser(sql, { user_id: id, });
   };
 
+  /**
+   *
+   * @param vals
+   * @return {Promise<{success: boolean, results: [*]} | void>}
+   */
   this.addUser = function(vals) {
     vals['upassword'] = bcrypt.hashSync(vals.upassword);
 
@@ -84,7 +100,7 @@ VALUES (:user_id, :first_name, :last_name, :upassword, :email, :birthday, :roles
 
         return query(sql, vals);
       })
-      .then(results => {
+      .then(() => {
         // return an object to our calling method:
         return {
           success: true,
@@ -100,55 +116,52 @@ VALUES (:user_id, :first_name, :last_name, :upassword, :email, :birthday, :roles
   /**
    *
    * @param {string} userId
-   * @param {array} body
+   * @param {Object} body
    * @return {Promise}
    */
   this.updateUser = function(userId, body) {
     let sql = 'UPDATE users SET ';
-    let where = ' WHERE user_id = ?';
+    let where = ' WHERE user_id = :user_id';
 
     let update = [];
     let values = [];
 
-    if (body.hasOwnProperty('first_name')) {
-      update.push('first_name = ?,');
-      values.push(body.first_name);
+    if (Object.prototype.hasOwnProperty.call(body, 'first_name')) {
+      update.push('first_name = :first_name,');
+      values.push(body['first_name']);
     }
 
-    if (body.hasOwnProperty('last_name')) {
-      update.push('last_name = ?,');
-      values.push(body.last_name);
+    if (Object.prototype.hasOwnProperty.call(body,'last_name')) {
+      update.push('last_name =:last_name,');
+      values.push(body['last_name']);
     }
 
-    if (body.hasOwnProperty('email')) {
-      update.push('email = ?,');
-      values.push(body.email);
+    if (Object.prototype.hasOwnProperty.call(body,'email')) {
+      update.push('email = :email,');
+      values.push(body['email']);
     }
 
-    if (body.hasOwnProperty('birthday')) {
-      update.push('birthday = ?,');
-      values.push(body.birthday);
+    if (Object.prototype.hasOwnProperty.call(body,'birthday')) {
+      update.push('birthday = :birthday,');
+      values.push(body['birthday']);
     }
 
-    if (body.hasOwnProperty('roles')) {
-      update.push('roles = ?,');
-      values.push(body.roles);
+    if (Object.prototype.hasOwnProperty.call(body,'roles')) {
+      update.push('roles = :roles,');
+      values.push(body['roles']);
     }
 
-    if (body.hasOwnProperty('upassword')) {
+    if (Object.prototype.hasOwnProperty.call(body, 'upassword')) {
       let encryptedPassword = bcrypt.hashSync(body.password);
 
-      update.push('upassword = ?,');
+      update.push('upassword = :upassword,');
       values.push(encryptedPassword);
     }
 
-    update.push('updated_at = ?');
-    values.push(body.updated_at);
-
-    sql += update.join('') + where;
+    sql += update.join(',') + where;
     values.push(userId);
 
-    return this.runQuery(sql, values)
+    return query(sql, values)
       .then(results => {
         // console.log('updated x records:', results.resultSet.affectedRows);
 
@@ -157,20 +170,11 @@ VALUES (:user_id, :first_name, :last_name, :upassword, :email, :birthday, :roles
           success: success,
           message: success ? 'success' : 'No User Found',
         };
-      })
-      .catch(error => {
-        console.log('EXCEPTION UPDATING USER:', error);
-
-        return {
-          success: false,
-          message: 'Error Occurred Updating User',
-        };
       });
   };
 
   this.isEmailUnique = function(email) {
     let sql = 'SELECT COUNT(*) AS found FROM users WHERE email = :email';
-
     return query(sql, { email, });
   };
 
