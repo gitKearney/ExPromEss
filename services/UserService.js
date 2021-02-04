@@ -77,7 +77,11 @@ function UserService(users) {
         }
 
         const hasReadPermission = rs['role'] === 'read';
-        return (hasReadPermission && needsEditPermission);
+        if (hasReadPermission && needsReadPermission) {
+          return true;
+        }
+
+        throw new Error('Permissions Denied, Foo');
       });
   };
 }

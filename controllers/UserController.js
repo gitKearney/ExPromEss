@@ -18,12 +18,7 @@ function UserController(authService, userService) {
         const requires = uuid === '' ? 'create' : 'edit';
         return userService.canUserAccess(user.data['user_id'], requires);
       })
-      .then((hasPermission) => {
-        if (!hasPermission) {
-          throw new Error('Permissions Denied');
-        }
-        return userService.handleGet(uuid);
-      });
+      .then(() => userService.handleGet(uuid));
   };
 
   this.delete = function(request) {
