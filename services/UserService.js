@@ -1,4 +1,5 @@
 let uuidv4  = require('uuid/v4');
+let configs = require('../configs/jwt.example');
 
 /**
  *
@@ -12,15 +13,15 @@ function UserService(users) {
   };
 
   this.handleGet = function(userId) {
-    // TODO: does requester have access to this user's info?
-    return users.getUserById(userId)
-      .then((data) => {
+    return users.getUsers(userId)
+      .then(results => {
         // don't expose the password
-        if (data.success === true) {
-          data.results.forEach(element => delete(element.upassword));
+        if (Array.isArray(results)) {
+          results.forEach(element => delete(element.upassword));
+        } else {
+          delete results['upassword'];
         }
-
-        return data;
+        return results;
       })
       .catch((err) => {
         console.log('UserService caught error ', err);
@@ -58,30 +59,44 @@ function UserService(users) {
    * @return {Promise<bool>}
    */
   this.canUserAccess = function(userId, requires) {
-    return users.getUserById(userId)
+    const skipCheck = new Promise((resolve) => {
+      if (configs.disable_auth) {
+        resolve(true);
+        return;
+      }
+
+      resolve(false);
+    });
+
+    return skipCheck
+      .then((skip) => {
+        if (skip) {
+          return true;
+        }
+
+        return users.getUserById(userId);
+      })
       .then((rs) => {
         if(rs['role'] === 'create') {
           // this is the equivalent of admin
           return true;
         }
 
-        const needsEditPermission = requires === 'edit';
-        const hasEditPermission = rs['role'] === 'edit';
-        if (hasEditPermission && needsEditPermission) {
-          return true;
-        }
-
         const needsReadPermission = requires === 'read';
-        if (hasEditPermission && needsReadPermission) {
+        const needsEditPermission = requires === 'edit';
+
+        const hasEditPermission = rs['role'] === 'edit';
+        const hasReadPermission = rs['role'] === 'read';
+
+        if (hasEditPermission && (needsReadPermission || needsEditPermission)) {
           return true;
         }
 
-        const hasReadPermission = rs['role'] === 'read';
         if (hasReadPermission && needsReadPermission) {
           return true;
         }
 
-        throw new Error('Permissions Denied, Foo');
+        throw (new Error('Permissions Denied, Foo'));
       });
   };
 }

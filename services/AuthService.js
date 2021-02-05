@@ -48,7 +48,7 @@ function AuthService(user) {
           nbf: currentTime,
         };
 
-        let token =  jwt.sign(tokenData, appConfigs.jwt.secret);
+        let token = jwt.sign(tokenData, appConfigs.jwt.secret);
         return {
           success: true,
           message: 'success',
@@ -75,18 +75,23 @@ function AuthService(user) {
     });
   };
 
-  this.authenticate = function(auth) {
+  this.decode = function(bearer) {
     return new Promise((resolve, reject) => {
-      if (!auth) {
+      if (appConfigs.jwt.disable_auth) {
+        resolve({ data: { user_id: '', }, }); // satisfy next promise
+        return;
+      }
+
+      if (!bearer) {
         reject(new Error('Access Denied'));
         return;
       }
 
-      let bearer = auth.split(' ');
-      let token = bearer[1];
+      let parts = bearer.split(' ');
+      let token = parts[1];
       jwt.verify(token, appConfigs.jwt.secret, (error, decoded) => {
         if (error) {
-          reject(new Error('Access Denied'));
+          reject(error);
           return;
         }
 

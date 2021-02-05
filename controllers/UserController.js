@@ -9,75 +9,38 @@ function UserController(authService, userService) {
   /**
    *
    * @param {string} uuid
-   * @param {string} authorization
+   * @param {string} bearer
    * @return {*}
    */
-  this.get = function(uuid, authorization) {
-    return authService.authenticate(authorization)
-      .then((user) => {
-        const requires = uuid === '' ? 'create' : 'edit';
-        return userService.canUserAccess(user.data['user_id'], requires);
-      })
+  this.get = function(uuid, bearer) {
+    const requires = uuid === '' ? 'create' : 'edit';
+
+    return authService.decode(bearer)
+      .then((user) => userService.canUserAccess(user.data['user_id'], requires))
       .then(() => userService.handleGet(uuid));
   };
 
-  this.delete = function(request) {
-    let userId = request.params.uuid;
-
-    return authService.authenticate(request.headers.get('authorization'))
-      .then(decodedJwt => {
-        // decodedJwt is an Object that contains email and user_id
-        let userInfo = { ...{},
-          user_id: decodedJwt.data.user_id,
-          email: decodedJwt.data.email,
-        };
-
-        return this.userService.handleDelete(userId, userInfo);
-      })
-      .then(result => {
-        return result;
-      })
-      .catch(error => {
-        return error;
-      });
+  this.delete = function(uuid, bearer) {
+    return authService.decode(bearer)
+      .then((user) => userService.canUserAccess(user.data['user_id'], 'create'))
+      .then(() => userService.handleDelete(uuid));
   };
 
-  this.patch = function(request) {
-    let uuid = request.params.uuid;
-    let body = request.body;
-
-    return this.authService.decodeJwt(request.headers)
-      .then(decodedJwt => {
-        // let userInfo = { ...{},
-        //   user_id: decodedJwt.data.user_id,
-        //   email: decodedJwt.data.email,
-        // };
-
-        return this.userService.handleUpdate(uuid, body);
-      })
-      .then(result => {
-        return result;
-      })
-      .catch(error => {
-        return error;
-      });
+  this.patch = function(uuid, body, bearer) {
+    return authService.decode(bearer)
+      .then((user) => userService.canUserAccess(user.data['user_id'], 'edit'))
+      .then(() => userService.handleUpdate(uuid, body));
   };
 
   this.post = function(body) {
     return userService.handlePost(body);
   };
 
-  this.put = function(request) {
-    let uuid = request.body.id;
-    let body = request.body;
-
-    return userService.handleUpdate(uuid, body)
-      .then(result => {
-        return result;
-      })
-      .catch(error => {
-        return error;
-      });
+  this.put = function(body, bearer) {
+    const uuid = body['uuid'];
+    return authService.decode(bearer)
+      .then((user) => userService.canUserAccess(user.data['user_id'], 'edit'))
+      .then(() => userService.handleUpdate(uuid, body));
   };
 }
 

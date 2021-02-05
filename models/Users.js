@@ -33,10 +33,28 @@ function Users() {
     return query(sql, params)
       .then((results) => {
         if (results.resultSet.length === 0) {
-          throw new Error('Invalid User');
+          return [];
         }
 
         return results.resultSet[0];
+      });
+  };
+
+  /**
+   * @param {string} id
+   * @return {Promise<T>}
+   */
+  this.getUsers = function(id) {
+    if (id.length !== 0) {
+      return this.getUserById(id);
+    }
+
+    const sql = `SELECT user_id, first_name, last_name, upassword, email,
+      birthday, roles as role FROM users`;
+
+    return query(sql, {})
+      .then((results) => {
+        return results.resultSet;
       });
   };
 
@@ -59,15 +77,13 @@ birthday, roles as role FROM users WHERE email = :email`;
    * @return {Promise<*[]>}
    */
   this.getUserById = function(id) {
-    let sql = 'SELECT user_id, first_name, last_name, upassword, email, ' +
-    'birthday, roles as role FROM users';
-
-    if (id !== '') {
-      sql += ' WHERE user_id = :user_id';
-    }
+    let sql = `SELECT user_id, first_name, last_name, upassword, email, 
+birthday, roles as role FROM users WHERE user_id = :user_id`;
 
     return this.getUser(sql, { user_id: id, });
   };
+
+
 
   /**
    *
@@ -124,41 +140,40 @@ VALUES (:user_id, :first_name, :last_name, :upassword, :email, :birthday, :roles
     let where = ' WHERE user_id = :user_id';
 
     let update = [];
-    let values = [];
+    let values = {};
 
     if (Object.prototype.hasOwnProperty.call(body, 'first_name')) {
-      update.push('first_name = :first_name,');
-      values.push(body['first_name']);
+      update.push('first_name = :first_name');
+      values['first_name'] = body['first_name'];
     }
 
     if (Object.prototype.hasOwnProperty.call(body,'last_name')) {
-      update.push('last_name =:last_name,');
-      values.push(body['last_name']);
+      update.push('last_name =:last_name');
+      values['last_name'] = body['last_name'];
     }
 
     if (Object.prototype.hasOwnProperty.call(body,'email')) {
-      update.push('email = :email,');
-      values.push(body['email']);
+      update.push('email = :email');
+      values['email'] = body['email'];
     }
 
     if (Object.prototype.hasOwnProperty.call(body,'birthday')) {
-      update.push('birthday = :birthday,');
-      values.push(body['birthday']);
+      update.push('birthday = :birthday');
+      values['birthday'] = body['birthday'];
     }
 
     if (Object.prototype.hasOwnProperty.call(body,'roles')) {
-      update.push('roles = :roles,');
-      values.push(body['roles']);
+      update.push('roles = :roles');
+      values['roles'] = body['roles'];
     }
 
-    if (Object.prototype.hasOwnProperty.call(body, 'upassword')) {
+    if (Object.prototype.hasOwnProperty.call(body, 'password')) {
       let encryptedPassword = bcrypt.hashSync(body.password);
-
-      update.push('upassword = :upassword,');
-      values.push(encryptedPassword);
+      update.push('upassword = :upassword');
+      values['upassword'] = encryptedPassword;
     }
 
-    sql += update.join(',') + where;
+    sql += update.join('') + where;
     values.push(userId);
 
     return query(sql, values)
