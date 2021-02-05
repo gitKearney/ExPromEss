@@ -35,7 +35,8 @@ function UserService(users) {
 
   this.handlePost = function(params) {
     const values = this.verifyPostParams(params);
-    return users.addUser(values);
+    return users.addUser(values)
+      .then(uuid => uuid);
   };
 
   this.verifyPostParams = function(params) {

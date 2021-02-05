@@ -56,8 +56,7 @@ function createUserRouter() {
   userRouter.post('/', function(request, response) {
     userController.post(request.body)
       .then((res) => {
-        console.log('RES (GOOD)', res);
-        response.send(res);
+        response.send({success: true, result: res, });
       })
       .catch((err) => {
         console.log('RES (ERROR)', err.message);

@@ -117,11 +117,7 @@ VALUES (:user_id, :first_name, :last_name, :upassword, :email, :birthday, :roles
         return query(sql, vals);
       })
       .then(() => {
-        // return an object to our calling method:
-        return {
-          success: true,
-          results: [ vals['user_id'], ],
-        };
+        return vals['user_id'];
       })
       .catch(error => {
         console.log('EXCEPTION OCCURRED - ADDING USER', error);
