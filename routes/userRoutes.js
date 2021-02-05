@@ -43,10 +43,10 @@ function createUserRouter() {
   });
 
   userRouter.patch('/:uuid', function(request, response) {
-    // TODO: pass in UUID & body
-    userController.patch(request)
+    const auth = request.get('authorization');
+    userController.patch(request.params['uuid'], request.body, auth)
       .then(res => {
-        response.send(res);
+        response.send({success: true, result: res, });
       })
       .catch((err) => {
         response.send({ success: false, message: err.message, });
@@ -64,9 +64,10 @@ function createUserRouter() {
   });
 
   userRouter.put('/', function(request, response) {
-    userController.put(request)
+    const auth = request.get('authorization');
+    userController.put(request.body, auth)
       .then(res => {
-        response.send(res);
+        response.send({success: true, result: res, });
       })
       .catch((err) => {
         response.send({ success: false, message: err.message, });

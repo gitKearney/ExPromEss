@@ -169,18 +169,14 @@ VALUES (:user_id, :first_name, :last_name, :upassword, :email, :birthday, :roles
       values['upassword'] = encryptedPassword;
     }
 
-    sql += update.join('') + where;
-    values.push(userId);
+    sql += update.join(',') + where;
+    values['user_id'] = userId;
 
     return query(sql, values)
       .then(results => {
         // console.log('updated x records:', results.resultSet.affectedRows);
 
-        let success = results.resultSet.affectedRows === 1;
-        return {
-          success: success,
-          message: success ? 'success' : 'No User Found',
-        };
+        return results.resultSet.affectedRows === 1;
       });
   };
 

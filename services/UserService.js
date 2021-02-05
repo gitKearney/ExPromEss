@@ -1,11 +1,6 @@
 let uuidv4  = require('uuid/v4');
 let configs = require('../configs/jwt.example');
 
-/**
- *
- * @param {Users} users
- * @param {TimeService} timeService
- */
 function UserService(users) {
 
   this.handleDelete = function(userId) {
@@ -40,24 +35,21 @@ function UserService(users) {
   };
 
   this.verifyPostParams = function(params) {
-    let insertValues = {
-      'user_id':    uuidv4(),
+    return {
+      'user_id': uuidv4(),
       'first_name': params.first_name ?? null,
-      'last_name':  params.last_name ?? null,
-      'upassword':  params.password ?? null,
-      'email':      params.email ?? null,
-      'birthday':   params.birthday ?? null,
-      'roles':      'read', // all users are read, admin changes them
+      'last_name': params.last_name ?? null,
+      'upassword': params.password ?? null,
+      'email': params.email ?? null,
+      'birthday': params.birthday ?? null,
+      'roles': 'read', // all users are read, admin changes them
     };
-
-    return insertValues;
   };
 
   /**
-   *
    * @param {string} userId
    * @param {string} requires
-   * @return {Promise<bool>}
+   * @return {Promise<boolean>}
    */
   this.canUserAccess = function(userId, requires) {
     const skipCheck = new Promise((resolve) => {
