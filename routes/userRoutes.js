@@ -59,7 +59,6 @@ function createUserRouter() {
         response.send({success: true, result: res, });
       })
       .catch((err) => {
-        console.log('RES (ERROR)', err.message);
         response.send({success: false, message: err.message, });
       });
   });

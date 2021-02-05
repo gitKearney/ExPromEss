@@ -77,7 +77,7 @@ function AuthService(user) {
 
   this.decode = function(bearer) {
     return new Promise((resolve, reject) => {
-      if (appConfigs.jwt.disable_auth) {
+      if (appConfigs.disable_auth) {
         resolve({ data: { user_id: '', }, }); // satisfy next promise
         return;
       }

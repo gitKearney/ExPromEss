@@ -78,6 +78,10 @@ function UserService(users) {
         return users.getUserById(userId);
       })
       .then((rs) => {
+        if (rs === true) {
+          return true;
+        }
+
         if(rs['role'] === 'create') {
           // this is the equivalent of admin
           return true;
