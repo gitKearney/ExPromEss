@@ -7,14 +7,7 @@ function Products() {
     let limit = page * 3;
     let sql = 'SELECT product_id, title, price, quantity FROM products LIMIT :limit, 3';
 
-    return query(sql, { limit, })
-      .then(results => {
-        if (results.resultSet.length === 0) {
-          return [];
-        }
-
-        return results.resultSet;
-      });
+    return query(sql, { limit, });
   };
 
   /**

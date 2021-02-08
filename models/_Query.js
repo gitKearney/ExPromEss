@@ -4,7 +4,7 @@ function query(sql, params) {
   const executor = (resolve, reject) => {
     pool.getConnection((err, connection) => {
       if (err) {
-        reject(new Error('failed to establish connection'));
+        reject('failed to establish connection');
       }
 
       connection.config.queryFormat = function(query, values) {
@@ -21,7 +21,7 @@ function query(sql, params) {
         connection.release();
 
         if (error) {
-          reject(new Error('error with query'));
+          reject('error with query');
           return;
         }
 

@@ -21,7 +21,14 @@ module.exports = function ProductRouter()
   productsRouter.get('/:page', function(request, response)
   {
     const auth = request.get('authorization');
-    productsController.get(request.params, auth);
+    const page = request.params['page'];
+    productsController.get({ page: page, }, auth)
+      .then(res => {
+        response.send({ success: true, results: res, });
+      })
+      .catch(err => {
+        response.send({ success: false, results: [], message: err.message, });
+      });
   });
 
   return productsRouter;

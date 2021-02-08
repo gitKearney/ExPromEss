@@ -8,8 +8,8 @@ function ProductsController(authService, productService, userService) {
     }
 
     return authService.decode(bearer)
-    .then((user) => userService.canUserAccess(user.data['user_id'], 'create'))
-    .then(() => productService.getPaginatedData(page));
+      .then((user) => userService.canUserAccess(user.data['user_id'], 'create'))
+      .then(() => productService.getPaginatedData(page));
   };
 }
 
