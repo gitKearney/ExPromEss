@@ -175,7 +175,6 @@ VALUES (:user_id, :first_name, :last_name, :upassword, :email, :birthday, :roles
     return query(sql, values)
       .then(results => {
         // console.log('updated x records:', results.resultSet.affectedRows);
-
         return results.resultSet.affectedRows === 1;
       });
   };

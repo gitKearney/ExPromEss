@@ -1,3 +1,4 @@
+// TODO: put contents of this file in new file called db.js. DO NOT COMMIT db.js
 const mariaCredentials = {
   connectionLimit : 5,
   host            : '127.0.0.1',

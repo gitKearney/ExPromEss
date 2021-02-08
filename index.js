@@ -11,8 +11,8 @@ let app = express();
  */
 function allowCors(request, response, next) {
   response.setHeader('Access-Control-Allow-Origin', '*');
-  response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTION');
-  response.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Authorization');
+  response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  response.setHeader('Access-Control-Allow-Headers', ' Authorization, Content-Type, Origin, X-Requested-With');
 
   response.type('json');
 
@@ -29,11 +29,10 @@ function logRequest(request, response, next) {
 }
 
 // SETUP MIDDLEWARE
-app.use(
-  [ allowCors, logRequest, ],
-  express.json({ inflate: true, }),
-  express.urlencoded({ extended: true, inflate: true, })
-);
+app.use('/', allowCors);
+app.use('/', logRequest);
+app.use(express.urlencoded({ extended: true, inflate: true, }));
+app.use(express.json({ inflate: true, }));
 
 let createUserRouter = require('./routes/userRoutes');
 let userRouter = new createUserRouter(express);

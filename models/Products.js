@@ -1,52 +1,19 @@
-const uuidv4  = require('uuid/v4');
+const uuidv4 = require('uuid/v4');
+const query  = require('./_Query');
 
-/**
- * Represents a product
- * @constructor
- */
 function Products() {
-  let columnNames = [
-    'product_id',
-    'title',
-    'price',
-    'quantity',
-    'created_at',
-    'updated_at',
-  ];
-
   this.getProductsByPage = function(page) {
-    let limit = (page - 1) * 3; // only return 3 products at a time
-    let sql = 'SELECT product_id, title, price, quantity FROM products' +
-      ' LIMIT ?, 3';
+    // this query returns 3 products per page
+    let limit = page * 3;
+    let sql = 'SELECT product_id, title, price, quantity FROM products LIMIT :limit, 3';
 
-    return this.runQuery(sql, [ limit, ])
+    return query(sql, { limit, })
       .then(results => {
         if (results.resultSet.length === 0) {
-          return {
-            success: false,
-            message: 'No Products Found',
-            results: [],
-          };
+          return [];
         }
 
-        let rs = [];
-        results.resultSet.forEach((element) => {
-          let record = { ...element, };
-          rs.push(record);
-        });
-
-        return {
-          success: true,
-          message: 'success',
-          results: rs,
-        };
-      })
-      .catch(error => {
-        console.log('EXCEPTION OCCURRED SELECTING: ', error);
-        return {
-          success: false,
-          message: 'Error Occurred Finding Products',
-        };
+        return results.resultSet;
       });
   };
 

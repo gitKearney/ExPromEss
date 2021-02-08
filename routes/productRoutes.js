@@ -1,4 +1,4 @@
-const {createProductController} = require('../factory/Container');
+const { createProductController, } = require('../factory/Container');
 
 function ProductRouter(express) {
   // create a router for user URIs

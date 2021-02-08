@@ -85,7 +85,8 @@ const container = {
   productController: function() {
     let authService = this.authService();
     let productService = this.productService();
-    return new ProductController(authService, productService);
+    let userService = this.userService();
+    return new ProductController(authService, productService, userService);
   },
 
   /**
@@ -94,7 +95,9 @@ const container = {
   productsController: function() {
     let authService = this.authService();
     let productService = this.productService();
-    return new ProductsController(authService, productService);
+    let userService = this.userService();
+
+    return new ProductsController(authService, productService, userService);
   },
 };
 
