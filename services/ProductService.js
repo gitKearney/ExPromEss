@@ -5,11 +5,13 @@ function ProductService(productModel) {
   };
 
   this.handleGet = function(productId) {
-    return productModel.getProductById(productId);
+    return productModel.getProductById(productId)
+      .then(rs => rs.resultSet);
   };
 
   this.getPaginatedData = function(page) {
-    return productModel.getProductsByPage(page);
+    return productModel.getProductsByPage(page)
+      .then(rs => rs.resultSet);
   };
 
   this.handleUpdate = function(uuid, params) {
@@ -17,7 +19,13 @@ function ProductService(productModel) {
   };
 
   this.handlePost = function(params) {
-    return productModel.addNewProduct(params);
+    const values = {
+      title: params['title'] ?? null,
+      price: params['price'] ?? null,
+      quantity: params['quantity'] ?? null,
+    };
+
+    return productModel.addNewProduct(values);
   };
 }
 

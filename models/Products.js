@@ -4,17 +4,12 @@ const query  = require('./_Query');
 function Products() {
   this.getProductsByPage = function(page) {
     // this query returns 3 products per page
-    let limit = page * 3;
+    let limit = (page - 1) * 3;
     let sql = 'SELECT product_id, title, price, quantity FROM products LIMIT :limit, 3';
 
     return query(sql, { limit, });
   };
 
-  /**
-   * Selects a product by ID
-   * @param {string} productId
-   * @return {Promise} records found
-   */
   this.getProductById = function(productId) {
     let sql = 'SELECT product_id, title, price, quantity FROM products';
 
@@ -22,7 +17,7 @@ function Products() {
       sql += ' WHERE product_id = ?';
     }
 
-    return this.runQuery(sql, [ productId, ])
+    return query(sql, [ productId, ])
       .then(results => {
         if (results.resultSet.length === 0) {
           return {
@@ -53,118 +48,56 @@ function Products() {
       });
   };
 
-  /**
-   * Creates a new product
-   * @param {Object} body
-   * @return {Promise}
-   */
-  this.addNewProduct = function(body) {
-    let sql = 'INSERT INTO products (';
-    let val = ') VALUES (';
-    let end = ')';
 
-    body.product_id = uuidv4();
+  this.addNewProduct = function(values) {
+    const sql = `INSERT INTO products (product_id, title, price, quantity)
+VALUES(:product_id, :title, :price, :quantity)`;
 
-    let insert = [];
-    let values = [];
-    let holders = [];
+    // check to see if the UUID already exists
+    let productId = null;
+    return this.getUuids()
+      .then(ids => {
 
-    for (let prop in body) {
-      // get only actual properties and not constructor properties
-      if (body.hasOwnProperty(prop)) {
-        // check to make sure the property is valid
-        if (columnNames.indexOf(prop) !== -1) {
-          insert.push(prop);
-          holders.push('?');
-          values.push(body[prop]);
-        }
-      }
-    }
+        let index = -1;
+        do {
+          productId = uuidv4();
+          index = ids.findIndex(element => element === productId);
+        } while(index !== -1);
 
-    if (holders.length === 0 || holders.length !== columnNames.length) {
-      throw new Error('Invalid Params');
-    }
-
-    sql += insert.join(',') + val + holders.join(',') + end;
-
-    return this.isUuidUnique(body.product_id)
-      .then((uniqueResults) => {
-        let found = uniqueResults.resultSet[0].found;
-
-        if (found) {
-          throw new Error('NON-UNIQUE UUID');
-        }
-
-        return this.runQuery(sql, values);
+        values['product_id'] = productId;
+        return query(sql, values);
       })
-      .then((insertResults) => {
-        return {
-          results: body.product_id,
-          success: true,
-          message: 'success',
-        };
-      })
-      .catch((error) => {
-        console.log('EXCEPTION ADDING PRODUCT - ', error);
-
-        return {
-          results: '',
-          success: false,
-          message: 'Error Adding New Products',
-        };
+      .then(qrs => {
+        console.log('insert response', qrs);
+        return productId;
       });
   };
 
-  /**
-   * Updates a product
-   * @param {string} productId
-   * @param {Object} body
-   * @return {Promise}
-   */
   this.updateProduct = function(productId, body) {
-    let sql = 'UPDATE products SET ';
-    let where = ' WHERE product_id = ?';
-
     let update = [];
-    let values = [];
+    let values = {};
 
-    if (body.hasOwnProperty('title')) {
-      update.push('title = ?,');
-      values.push(body.title);
+    if (Object.prototype.hasOwnProperty.call(body, 'title')) {
+      update.push('title = :title');
+      values['title'] = body['title'];
     }
 
-    if (body.hasOwnProperty('price')) {
-      update.push('price = ?,');
-      values.push(body.price);
+    if (Object.prototype.hasOwnProperty.call(body, 'price')) {
+      update.push('price = :price');
+      values['price'] = body.price;
     }
 
-    if (body.hasOwnProperty('quantity')) {
-      update.push('quantity = ?,');
-      values.push(body.quantity);
+    if (Object.prototype.hasOwnProperty.call(body, 'quantity')) {
+      update.push('quantity = :quantity');
+      values['quantity'] = body.quantity;
     }
 
-    update.push('updated_at = ?');
-    values.push(body.updated_at);
+    let sql = 'UPDATE products SET ' + update.join(',') + ' WHERE product_id = :product_id';
+    values['product_id'] = productId;
 
-    sql += update.join('') + where;
-    values.push(productId);
-
-    return this.runQuery(sql, values)
+    return query(sql, values)
       .then(results => {
-        let updated = results.resultSet.affectedRows === 1;
-
-        return {
-          success: updated,
-          message: updated ? 'Success' : 'No Products Found',
-        };
-      })
-      .catch(error => {
-        console.log('EXCEPTION OCCURRED UPDATING ', error);
-
-        return {
-          success: false,
-          message: 'Error Occurred Updating',
-        };
+        return results.resultSet.affectedRows === 1;
       });
   };
 
@@ -174,10 +107,10 @@ function Products() {
    * @return {Promise}
    */
   this.deleteProduct = function(productId) {
-    let sql = 'DELETE FROM products WHERE product_id = ?';
-    let values = [ productId, ];
+    let sql = 'DELETE FROM products WHERE product_id = :product_id';
+    let values = { product_id: productId, };
 
-    return this.runQuery(sql, values)
+    return query(sql, values)
       .then(result => {
         let updated = result.resultSet.affectedRows === 1;
 
@@ -196,14 +129,9 @@ function Products() {
       });
   };
 
-  /**
-   * Looks to see if the UUID is unique or not. Resolves to 0 or 1
-   * @param {string} uuid
-   * @return {Promise}
-   */
-  this.isUuidUnique = function(uuid) {
-    let sql  = 'SELECT COUNT(*) AS found FROM products WHERE product_id = ?';
-    return this.runQuery(sql, [ uuid, ]);
+  this.getUuids = function() {
+    let sql  = 'SELECT product_id FROM products';
+    return query(sql, { });
   };
 }
 
