@@ -1,46 +1,12 @@
 function ProductController(authService, productService) {
 
-  this.get = function(request) {
-    let productId = '';
-    if (request.params.hasOwnProperty('uuid')) {
-      productId = request.params.uuid;
-    }
-
-    return this.authService.decodeJwt(request.headers)
-      .then((decodedJwt) => {
-        let userInfo = { ...{},
-          user_id: decodedJwt.data.user_id,
-          email: decodedJwt.data.email,
-        };
-
-        return this.productService.handleGet(productId);
-      })
-      .then(result => {
-        return result;
-      })
-      .catch(error => {
-        return error;
-      });
+  this.get = function(uuid) {
+    return productService.handleGet(uuid);
   };
 
-  this.delete = function(request) {
-    let uuid = request.params.uuid;
-
-    return this.authService.decodeJwt(request.headers)
-      .then((decodedJwt) => {
-        let userInfo = { ...{},
-          user_id: decodedJwt.data.user_id,
-          email: decodedJwt.data.email,
-        };
-
-        return this.productService.handleDelete(uuid);
-      })
-      .then(result => {
-        return result;
-      })
-      .catch(error => {
-        return error;
-      });
+  this.delete = function(params) {
+    let { uuid, } = params;
+    return productService.handleDelete(uuid);
   };
 
 

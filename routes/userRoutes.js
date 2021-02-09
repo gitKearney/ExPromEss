@@ -8,14 +8,12 @@ function createUserRouter() {
   let userController = createUserController();
 
   userRouter.delete('/:uuid', function(request, response) {
-    userController.delete(request.params)
+    const auth = request.get('authorization');
+    userController.delete(request.params['uuid'], auth)
       .then((res) => {
-        console.log('resolving:', res);
-        response.send(res);
+        response.send({ success: true, results: res, });
       })
       .catch(err => {
-        console.log('rejecting:', err);
-
         response.send({ success: false, message: err.message, });
       });
   });
@@ -24,7 +22,7 @@ function createUserRouter() {
     const auth = request.get('authorization');
     userController.get(request.params['uuid'], auth)
       .then((res) => {
-        response.send(res);
+        response.send({ success: true, results: res, });
       })
       .catch(err => {
         response.send({ success: false, message: err.message, });
@@ -35,7 +33,7 @@ function createUserRouter() {
     const auth = request.get('authorization');
     userController.get('', auth)
       .then((res) => {
-        response.send(res);
+        response.send({ success: true, results: res, });
       })
       .catch(err => {
         response.send({ success: false, message: err.message, });

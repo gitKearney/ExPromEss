@@ -11,24 +11,24 @@ function ProductRouter() {
 
   productRouter.delete('/:uuid', function(request, response) {
 
-    productController.delete(request)
+    productController.delete(request.params)
       .then((res) => {
-        response.send(res);
+        response.send({ success: true, results: res, });
       })
-      .catch(err => {
-        response.send(err);
+      .catch((err) => {
+        response.send({ success: false, results: err, });
       });
   });
 
   productRouter.get('/:uuid', function(request, response)
   {
-    productController.get(request)
-    .then((res) => {
-      response.send(res);
-    })
-    .catch(err => {
-      response.send(err);
-    });
+    productController.get(request.params['uuid'])
+      .then((res) => {
+        response.send({ success: true, results: res, });
+      })
+      .catch((err) => {
+        response.send({ success: false, results: err, });
+      });
   });
 
 

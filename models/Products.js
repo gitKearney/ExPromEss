@@ -11,41 +11,17 @@ function Products() {
   };
 
   this.getProductById = function(productId) {
-    let sql = 'SELECT product_id, title, price, quantity FROM products';
+    let sql = `SELECT product_id, title, price, quantity
+FROM products WHERE product_id = :product_id`;
 
-    if (productId !== '') {
-      sql += ' WHERE product_id = ?';
-    }
-
-    return query(sql, [ productId, ])
+    return query(sql, { product_id: productId, } )
       .then(results => {
         if (results.resultSet.length === 0) {
-          return {
-            success: false,
-            message: 'No Products Found',
-            results: [],
-          };
+          return [];
         }
 
-        let rs = [];
-        results.resultSet.forEach((element) => {
-          let record = { ...element, };
-          rs.push(record);
-        });
-
-        return {
-          success: true,
-          message: 'success',
-          results: rs,
-        };
+        return results.resultSet[0];
       })
-      .catch(error => {
-        console.log('EXCEPTION OCCURRED SELECTING: ', error);
-        return {
-          success: false,
-          message: 'Error Occurred Finding Products',
-        };
-      });
   };
 
 
@@ -102,32 +78,12 @@ VALUES(:product_id, :title, :price, :quantity)`;
       });
   };
 
-  /**
-   *
-   * @param {string} productId
-   * @return {Promise}
-   */
   this.deleteProduct = function(productId) {
     let sql = 'DELETE FROM products WHERE product_id = :product_id';
     let values = { product_id: productId, };
 
     return query(sql, values)
-      .then(result => {
-        let updated = result.resultSet.affectedRows === 1;
-
-        return {
-          success: updated,
-          message: updated ? 'Success' : 'No Products Found',
-        };
-      })
-      .catch(error => {
-        console.log('EXCEPTION DELETING: ', error);
-
-        return {
-          success: false,
-          message: 'Error Occurred Removing Products',
-        };
-      });
+      .then(result => result.resultSet.affectedRows === 1);
   };
 
   this.getUuids = function() {

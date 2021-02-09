@@ -4,31 +4,10 @@ const query  = require('./_Query');
 function Users() {
   this.deleteUser = function(userId) {
     let sql = 'DELETE FROM users WHERE user_id = :user_id';
-    return query(sql, { userId, })
-      .then(results => {
-        let success = results.resultSet.affectedRows === 1;
-
-        return {
-          success: success,
-          message: success ? 'success' : 'failure',
-        };
-      })
-      .catch(error => {
-        console.log('EXCEPTION DELETING USER: ', error);
-
-        return {
-          success: false,
-          message: 'Error Deleting User',
-        };
-      });
+    return query(sql, { user_id: userId, })
+      .then(results => results.resultSet.affectedRows === 1);
   };
 
-  /**
-   *
-   * @param {string} sql
-   * @param {Object} params
-   * @return {Promise<[]>}
-   */
   this.getUser = function(sql, params) {
     return query(sql, params)
       .then((results) => {
@@ -40,10 +19,6 @@ function Users() {
       });
   };
 
-  /**
-   * @param {string} id
-   * @return {Promise<T>}
-   */
   this.getUsers = function(id) {
     if (id.length !== 0) {
       return this.getUserById(id);
