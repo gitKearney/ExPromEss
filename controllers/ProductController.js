@@ -52,25 +52,9 @@ function ProductController(authService, productService) {
     return productService.handlePost(body);
   };
 
-  this.put = function(request) {
-    let uuid = request.body.id;
-    let body = request.body;
-
-    return this.authService.decodeJwt(request.headers)
-      .then((decodedJwt) => {
-        let userInfo = { ...{},
-          user_id: decodedJwt.data.user_id,
-          email: decodedJwt.data.email,
-        };
-
-        return this.productService.handleUpdate(uuid, body);
-      })
-      .then(result => {
-        return result;
-      })
-      .catch(error => {
-        return error;
-      });
+  this.put = function(body) {
+    let uuid = body['id'];
+    return productService.handleUpdate(uuid, body);
   };
 }
 

@@ -55,24 +55,16 @@ function ProductRouter() {
       });
   });
 
-  /**
-   * this corresponds to POST http://example.com/users
-   *
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {string} JSON data stringify
-   */
+
   productRouter.put('/', function(request, response)
   {
-    let productController = di.createProductController();
-
-    productController.put(request)
-    .then(res => {
-      response.send(res);
-    })
-    .catch(error => {
-      response.send(false);
-    });
+    productController.put(request.body)
+      .then((res) => {
+        response.send({ success: true, results: res, });
+      })
+      .catch((err) => {
+        response.send({ success: false, results: err, });
+      });
   });
 
   return productRouter;
