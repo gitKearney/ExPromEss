@@ -56,12 +56,13 @@ VALUES(:product_id, :title, :price, :quantity)`;
     // check to see if the UUID already exists
     let productId = null;
     return this.getUuids()
-      .then(ids => {
+      .then(results => {
+        let ids = results.resultSet;
 
         let index = -1;
         do {
           productId = uuidv4();
-          index = ids.findIndex(element => element === productId);
+          index = ids.findIndex(element => element.product_id === productId);
         } while(index !== -1);
 
         values['product_id'] = productId;
