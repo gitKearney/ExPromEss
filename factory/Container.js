@@ -1,18 +1,24 @@
 /** * IMPORT MODELS ***/
-let Users      = require('../models/Users');
-let Products   = require('../models/Products');
+let Users        = require('../models/Users');
+let Products     = require('../models/Products');
+let Transactions = require('../models/Transactions');
+let Cart         = require('../models/Cart');
 
 /** * IMPORT SERVICES ***/
 let AuthService    = require('../services/authService');
 let TimeService    = require('../services/timeService');
 let UserService    = require('../services/userService');
 let ProductService = require('../services/productService');
+let TransactionService = require('../services/TransactionService');
+let CartService    = require('../services/CartService');
 
 /** * IMPORT CONTROLLERS ***/
 let AuthController     = require('../controllers/AuthController');
 let UserController     = require('../controllers/UserController');
 let ProductController  = require('../controllers/ProductController');
-const ProductsController = require('../controllers/ProductsController');
+let ProductsController = require('../controllers/ProductsController');
+let TransactionController = require('../controllers/TransactionController');
+let CartController     = require('../controllers/CartController');
 
 const container = {
   // *** MODELS ***
@@ -29,6 +35,16 @@ const container = {
    */
   userModel: function() {
     return new Users();
+  },
+
+  /** @return {Transactions} */
+  transactionModel: function() {
+    return new Transactions();
+  },
+
+  /** @return {Cart} */
+  cartModel: function() {
+    return new Cart();
   },
 
   // *** SERVICES ***
@@ -58,6 +74,18 @@ const container = {
     let user = this.userModel();
     let timeService = this.timeService();
     return new UserService(user, timeService);
+  },
+
+  /** @return {TransactionService} */
+  transactionService: function() {
+    let transactions = this.transactionModel();
+    return new TransactionService(transactions);
+  },
+
+  /** @return {CartService} */
+  cartService: function() {
+    let cart = this.cartModel();
+    return new CartService(cart);
   },
 
   // *** CONTROLLERS ***
@@ -99,6 +127,21 @@ const container = {
 
     return new ProductsController(authService, productService, userService);
   },
+
+  /** @return {TransactionController} */
+  transactionController: function() {
+    let authService = this.authService();
+    let userService = this.userService();
+    let transactionService = this.transactionService();
+    return new TransactionController(authService, userService, transactionService);
+  },
+
+  /** @return {CartController} */
+  cartController: function() {
+    let authService = this.authService();
+    let cartService = this.cartService();
+    return new CartController(authService, cartService);
+  },
 };
 
 module.exports = {
@@ -128,5 +171,14 @@ module.exports = {
    */
   createProductsContainer: function() {
     return container.productsController();
+  },
+
+  /** @return {TransactionController} */
+  createTransactionController: function() {
+    return container.transactionController();
+  },
+
+  createCartController: function() {
+    return container.cartController();
   },
 };

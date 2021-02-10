@@ -35,23 +35,31 @@ app.use(express.urlencoded({ extended: true, inflate: true, }));
 app.use(express.json({ inflate: true, }));
 
 let createUserRouter = require('./routes/userRoutes');
-let userRouter = new createUserRouter(express);
+let userRouter = createUserRouter();
 app.use('/users', userRouter);
 
 let createAuthRouter = require('./routes/authRoutes');
-let authRouter = new createAuthRouter(express);
+let authRouter = createAuthRouter();
 app.use('/auth', authRouter);
 
 // This route performs operations on products, but does not return all products
 let createProductRouter = require('./routes/productRoutes');
-let productRouter = new createProductRouter(express);
+let productRouter = createProductRouter();
 app.use('/product', productRouter);
 
 // this route gets all products. If the user wants only 1 product then they
 // need to call `product/{id}`
 let createProductsRouter = require('./routes/productsRoutes');
-let productsRouter = new createProductsRouter(express);
+let productsRouter = createProductsRouter();
 app.use('/products', productsRouter);
+
+let createTransactionRouter = require('./routes/transactionRoutes');
+let transRouter = createTransactionRouter();
+app.use('/transactions', transRouter);
+
+let createCartRouter = require('./routes/cartRoutes');
+let cartRouter = createCartRouter();
+app.use('/cart', cartRouter);
 
 const PORT = process.argv[2] || 3123;
 

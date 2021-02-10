@@ -39,7 +39,7 @@ function UserService(users) {
       'user_id': uuidv4(),
       'first_name': params.first_name ?? null,
       'last_name': params.last_name ?? null,
-      'upassword': params.password ?? null,
+      'password': params.password ?? null,
       'email': params.email ?? null,
       'birthday': params.birthday ?? null,
       'roles': 'read', // all users are read, admin changes them

@@ -1,8 +1,7 @@
 const { Router, } = require('express');
 const { createProductsContainer, } = require('../factory/Container');
 
-module.exports = function ProductRouter()
-{
+function createProductRouter() {
   let productsRouter = Router();
   let productsController = createProductsContainer();
 
@@ -32,4 +31,6 @@ module.exports = function ProductRouter()
   });
 
   return productsRouter;
-};
+}
+
+module.exports = createProductRouter;

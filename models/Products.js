@@ -11,7 +11,8 @@ function Products() {
   };
 
   this.getProductById = function(productId) {
-    let sql = `SELECT product_id, title, price, quantity
+    let sql = `
+SELECT product_id, title, price, quantity
 FROM products WHERE product_id = :product_id`;
 
     return query(sql, { product_id: productId, } )
@@ -21,12 +22,13 @@ FROM products WHERE product_id = :product_id`;
         }
 
         return results.resultSet[0];
-      })
+      });
   };
 
 
   this.addNewProduct = function(values) {
-    const sql = `INSERT INTO products (product_id, title, price, quantity)
+    const sql = `
+INSERT INTO products (product_id, title, price, quantity)
 VALUES(:product_id, :title, :price, :quantity)`;
 
     // check to see if the UUID already exists
@@ -69,7 +71,8 @@ VALUES(:product_id, :title, :price, :quantity)`;
       values['quantity'] = body.quantity;
     }
 
-    let sql = 'UPDATE products SET ' + update.join(',') + ' WHERE product_id = :product_id';
+    let sets = update.join(',');
+    let sql = `UPDATE products SET ${sets} WHERE product_id = :product_id`;
     values['product_id'] = productId;
 
     return query(sql, values)

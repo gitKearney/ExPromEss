@@ -9,7 +9,7 @@ const JwtCredentials = {
     // it returns a random 32 character string
   },
   // for testing if you don't want to have auth, you can turn it off
-  disable_auth: true,
+  disable_auth: false,
 };
 
 module.exports = JwtCredentials;

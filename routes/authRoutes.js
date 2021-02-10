@@ -1,8 +1,9 @@
+const { Router, } = require('express');
 let { createAuthController, } = require('../factory/Container');
 
-module.exports = function(express)
+module.exports = function()
 {
-  let authRouter = express.Router();
+  let authRouter = Router();
 
   authRouter.post('/', function(request, response) {
     let authController = createAuthController();

@@ -2,6 +2,7 @@
 function UserController(authService, userService) {
 
   this.get = function(uuid, bearer) {
+    // e.g. of how to use authentication
     const requires = uuid === '' ? 'create' : 'edit';
 
     return authService.decode(bearer)
@@ -9,27 +10,24 @@ function UserController(authService, userService) {
       .then(() => userService.handleGet(uuid));
   };
 
+  // eslint-disable-next-line no-unused-vars
   this.delete = function(uuid, bearer) {
-    return authService.decode(bearer)
-      .then((user) => userService.canUserAccess(user.data['user_id'], 'create'))
-      .then(() => userService.handleDelete(uuid));
+    return userService.handleDelete(uuid);
   };
 
+  // eslint-disable-next-line no-unused-vars
   this.patch = function(uuid, body, bearer) {
-    return authService.decode(bearer)
-      .then((user) => userService.canUserAccess(user.data['user_id'], 'edit'))
-      .then(() => userService.handleUpdate(uuid, body));
+    return userService.handleUpdate(uuid, body);
   };
 
   this.post = function(body) {
     return userService.handlePost(body);
   };
 
+  // eslint-disable-next-line no-unused-vars
   this.put = function(body, bearer) {
     const uuid = body['user_id'];
-    return authService.decode(bearer)
-      .then((user) => userService.canUserAccess(user.data['user_id'], 'edit'))
-      .then(() => userService.handleUpdate(uuid, body));
+    return userService.handleUpdate(uuid, body);
   };
 }
 

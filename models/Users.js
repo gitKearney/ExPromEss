@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt-nodejs');
 const query  = require('./_Query');
+const uuidv4 = require('uuid/v4');
 
 function Users() {
   this.deleteUser = function(userId) {
@@ -33,24 +34,13 @@ function Users() {
       });
   };
 
-  /**
-   *
-   * @param {string} email
-   * @return {Promise<*[]>}
-   */
   this.getUserByEmail = function(email) {
-    let sql = `
-SELECT user_id, first_name, last_name, upassword, email,
+    let sql = `SELECT user_id, first_name, last_name, upassword, email,
 birthday, roles as role FROM users WHERE email = :email`;
 
     return this.getUser(sql, { email, });
   };
 
-  /**
-   *
-   * @param {string} id
-   * @return {Promise<*[]>}
-   */
   this.getUserById = function(id) {
     let sql = `SELECT user_id, first_name, last_name, upassword, email, 
 birthday, roles as role FROM users WHERE user_id = :user_id`;
@@ -59,59 +49,44 @@ birthday, roles as role FROM users WHERE user_id = :user_id`;
   };
 
 
+  this.addUser = function(values) {
+    values['upassword'] = bcrypt.hashSync(values['password']);
+    values['active'] = 'yes';
 
-  /**
-   *
-   * @param vals
-   * @return {Promise<{success: boolean, results: [*]} | void>}
-   */
-  this.addUser = function(vals) {
-    vals['upassword'] = bcrypt.hashSync(vals.upassword);
-
-    return this.isEmailUnique(vals['email'])
+    let userId = null;
+    return this.isEmailUnique(values['email'])
       .then((emailResults) => {
-        let found = emailResults.resultSet[0].found;
-
-        if (found === 1) {
-          // TODO: convert this to a custom error
+        if (emailResults.resultSet[0]['found'] === 1) {
           throw new Error('user already registered');
         }
 
-        return this.isUuidUnique(vals['user_id']);
+        return this.getUuids();
       })
       .then(uuidResults => {
-        let found = uuidResults.resultSet[0].found;
-        if (found) {
-          throw new Error('Error Assigning ID');
-        }
+        let ids = uuidResults.resultSet;
+        let index = -1;
+        do {
+          userId = uuidv4();
+          index = ids.findIndex(element => element.product_id === userId);
+        } while(index !== -1);
 
+        values['user_id'] = userId;
         let sql = `
-INSERT INTO users (user_id, first_name, last_name, upassword, email, birthday, roles)
-VALUES (:user_id, :first_name, :last_name, :upassword, :email, :birthday, :roles)`;
+INSERT INTO users 
+  (user_id, first_name, last_name, upassword, email, birthday, roles, active)
+VALUES 
+  (:user_id, :first_name, :last_name, :upassword, :email, :birthday, :roles, :active)`;
 
-        return query(sql, vals);
+        return query(sql, values);
       })
       .then(() => {
-        return vals['user_id'];
-      })
-      .catch(error => {
-        console.log('EXCEPTION OCCURRED - ADDING USER', error);
-        throw error;
+        return values['user_id'];
       });
   };
 
-  /**
-   *
-   * @param {string} userId
-   * @param {Object} body
-   * @return {Promise}
-   */
   this.updateUser = function(userId, body) {
-    let sql = 'UPDATE users SET ';
-    let where = ' WHERE user_id = :user_id';
-
     let update = [];
-    let values = {};
+    let values = { user_id: userId, };
 
     if (Object.prototype.hasOwnProperty.call(body, 'first_name')) {
       update.push('first_name = :first_name');
@@ -144,12 +119,13 @@ VALUES (:user_id, :first_name, :last_name, :upassword, :email, :birthday, :roles
       values['upassword'] = encryptedPassword;
     }
 
-    sql += update.join(',') + where;
-    values['user_id'] = userId;
+    let sets = update.join(',');
+
+
+    let sql = `UPDATE users SET ${sets} WHERE user_id = :user_id`;
 
     return query(sql, values)
       .then(results => {
-        // console.log('updated x records:', results.resultSet.affectedRows);
         return results.resultSet.affectedRows === 1;
       });
   };
@@ -159,10 +135,10 @@ VALUES (:user_id, :first_name, :last_name, :upassword, :email, :birthday, :roles
     return query(sql, { email, });
   };
 
-  this.isUuidUnique = function(uuid) {
-    let sql = 'SELECT COUNT(*) AS found FROM users WHERE user_id = :user_id';
+  this.getUuids = function() {
+    let sql = 'SELECT user_id FROM users';
 
-    return query(sql, { user_id: uuid, });
+    return query(sql, { });
   };
 }
 
