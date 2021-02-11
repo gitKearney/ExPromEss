@@ -17,20 +17,6 @@ function TransactionService(transactions) {
   };
 
   /**
-   * Take items from a cart, creates a transaction and clears out the cart
-   * @param userId
-   * @return {*}
-   */
-  this.addTransaction = function(userId) {
-    let trans = { user_id: userId, };
-
-    // TODO: get items from user's cart
-    // TODO: insert items from cart into transaction_products
-    // TODO: delete items from cart
-    return transactions.addTransaction(trans);
-  };
-
-  /**
    * Changes the user ID associated with a transaction
    * @param {string} transactionId
    * @param {string} userId

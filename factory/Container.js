@@ -9,8 +9,9 @@ let AuthService    = require('../services/authService');
 let TimeService    = require('../services/timeService');
 let UserService    = require('../services/userService');
 let ProductService = require('../services/productService');
-let TransactionService = require('../services/TransactionService');
 let CartService    = require('../services/CartService');
+let TransactionService = require('../services/TransactionService');
+let CheckoutService    = require('../services/CheckoutService');
 
 /** * IMPORT CONTROLLERS ***/
 let AuthController     = require('../controllers/AuthController');
@@ -19,6 +20,7 @@ let ProductController  = require('../controllers/ProductController');
 let ProductsController = require('../controllers/ProductsController');
 let TransactionController = require('../controllers/TransactionController');
 let CartController     = require('../controllers/CartController');
+let CheckoutController = require('../controllers/CheckoutController');
 
 const container = {
   // *** MODELS ***
@@ -88,6 +90,13 @@ const container = {
     return new CartService(cart);
   },
 
+  /** @return {CheckoutService} */
+  checkoutService: function() {
+    let cart = this.cartModel();
+    let trans = this.transactionModel();
+    return new CheckoutService(trans, cart);
+  },
+
   // *** CONTROLLERS ***
 
   /**
@@ -142,6 +151,12 @@ const container = {
     let cartService = this.cartService();
     return new CartController(authService, cartService);
   },
+
+  /** @return {CheckoutController} */
+  checkoutController: function() {
+    let checkoutService = this.checkoutService();
+    return new CheckoutController(checkoutService);
+  },
 };
 
 module.exports = {
@@ -178,7 +193,12 @@ module.exports = {
     return container.transactionController();
   },
 
+  /** @return {CartController} */
   createCartController: function() {
     return container.cartController();
+  },
+
+  createCheckoutController: function() {
+    return container.checkoutController();
   },
 };

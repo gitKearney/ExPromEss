@@ -62,6 +62,14 @@ AND transaction_id = :transaction_id`;
     let sql = 'SELECT transaction_id FROM transactions';
     return query(sql, {});
   };
+
+  this.addTransactionProducts = function(insertValues) {
+    let sql = `
+INSERT INTO transaction_products (transaction_id, product_id, product_price) 
+VALUES :inserts`;
+
+    return query(sql, { inserts: insertValues, });
+  };
 }
 
 module.exports = Transactions;

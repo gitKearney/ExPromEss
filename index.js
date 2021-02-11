@@ -61,6 +61,10 @@ let createCartRouter = require('./routes/cartRoutes');
 let cartRouter = createCartRouter();
 app.use('/cart', cartRouter);
 
+let createCheckoutRouter = require('./routes/checkoutRoutes');
+let checkoutRouter = createCheckoutRouter();
+app.use('/checkout', checkoutRouter);
+
 const PORT = process.argv[2] || 3123;
 
 app.listen(PORT, () => console.log(`server started http://localhost:${PORT}`));
