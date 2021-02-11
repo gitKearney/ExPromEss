@@ -16,12 +16,12 @@ function CheckoutService(transactions, cart) {
         return transactions.addTransactionProducts(insertValues);
       })
       .then((result) => {
-        if (result.affectedRows > 0) {
+        if (result.resultSet.affectedRows > 0) {
           console.log('INSERT GOOD');
         }
 
         cart.clearCart(userId);
-      })
+      });
   };
 }
 module.exports = CheckoutService;

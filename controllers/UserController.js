@@ -3,31 +3,37 @@ function UserController(authService, userService) {
 
   this.get = function(uuid, bearer) {
     // e.g. of how to use authentication
-    const requires = uuid === '' ? 'create' : 'edit';
+    const requires = uuid === '' ? 'edit' : 'read';
 
     return authService.decode(bearer)
-      .then((user) => userService.canUserAccess(user.data['user_id'], requires))
+      .then((user) => userService.canUserAccess(user.data['user_id'], requires, uuid))
       .then(() => userService.handleGet(uuid));
   };
 
-  // eslint-disable-next-line no-unused-vars
   this.delete = function(uuid, bearer) {
-    return userService.handleDelete(uuid);
+    const requires = 'edit';
+    return authService.decode(bearer)
+      .then((user) => userService.canUserAccess(user.data['user_id'], requires, uuid))
+      .then(() => userService.handleDelete(uuid));
   };
 
-  // eslint-disable-next-line no-unused-vars
   this.patch = function(uuid, body, bearer) {
-    return userService.handleUpdate(uuid, body);
+    const requires = 'read';
+    return authService.decode(bearer)
+      .then((user) => userService.canUserAccess(user.data['user_id'], requires, uuid))
+      .then(() => userService.handleUpdate(uuid, body));
   };
 
   this.post = function(body) {
     return userService.handlePost(body);
   };
 
-  // eslint-disable-next-line no-unused-vars
   this.put = function(body, bearer) {
+    const requires = 'read';
     const uuid = body['user_id'];
-    return userService.handleUpdate(uuid, body);
+    return authService.decode(bearer)
+      .then((user) => userService.canUserAccess(user.data['user_id'], requires, uuid))
+      .then(() => userService.handleUpdate(uuid, body));
   };
 }
 

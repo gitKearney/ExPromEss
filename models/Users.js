@@ -4,7 +4,7 @@ const uuidv4 = require('uuid/v4');
 
 function Users() {
   this.deleteUser = function(userId) {
-    let sql = 'DELETE FROM users WHERE user_id = :user_id';
+    let sql = 'UPDATE users SET active = \'no\' WHERE user_id = :user_id';
     return query(sql, { user_id: userId, })
       .then(results => results.resultSet.affectedRows === 1);
   };
@@ -13,7 +13,7 @@ function Users() {
     return query(sql, params)
       .then((results) => {
         if (results.resultSet.length === 0) {
-          return [];
+          return {role: '', };
         }
 
         return results.resultSet[0];

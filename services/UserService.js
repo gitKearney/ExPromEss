@@ -49,9 +49,10 @@ function UserService(users) {
   /**
    * @param {string} userId
    * @param {string} requires
-   * @return {Promise<boolean>}
+   * @param {string} uuid - the ID the bearer is requesting info about
+   * @return {Promise<Object>}
    */
-  this.canUserAccess = function(userId, requires) {
+  this.canUserAccess = function(userId, requires, uuid) {
     const skipCheck = new Promise((resolve) => {
       if (configs.disable_auth) {
         resolve(true);
@@ -69,7 +70,8 @@ function UserService(users) {
 
         return users.getUserById(userId);
       })
-      .then((rs) => {
+      .then(rs => {
+        // if auth checking is disabled, just return true
         if (rs === true) {
           return true;
         }
@@ -90,7 +92,9 @@ function UserService(users) {
         }
 
         if (hasReadPermission && needsReadPermission) {
-          return true;
+          if (uuid === rs['user_id']) {
+            return true;
+          }
         }
 
         throw (new Error('Permissions Denied, Foo'));
