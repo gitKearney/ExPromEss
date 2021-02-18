@@ -67,6 +67,7 @@ function UserService(users) {
             email: '',
             birthday: '',
             roles: 'create',
+            has_permission: true,
           };
         }
 

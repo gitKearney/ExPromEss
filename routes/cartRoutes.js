@@ -51,7 +51,7 @@ function createCartRoutes() {
         response.send({ success: true, results: res, });
       })
       .catch(err => {
-        response.send({ success: false, message: err, results: [], });
+        response.send({ success: false, message: err.message, results: [], });
       });
   });
 

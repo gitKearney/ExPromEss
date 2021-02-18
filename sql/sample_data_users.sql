@@ -28,6 +28,6 @@ VALUES
 (
     '12345678-1234-1234-1234-123456789003', 'Aaron', 'Burr',
     '$2a$10$baZyz2/429B/xNQJhmYRE./tV0Pic1X7TLIsek83ZdUDMASWa3j2K',
-    'aaron.burr@example.com', '2001-02-06', 'edit', 'yes',
+    'aaron.burr@example.com', '2001-02-06', 'read', 'yes',
     '2015-12-31', NULL
 );

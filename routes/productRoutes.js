@@ -44,7 +44,7 @@ function ProductRouter() {
         response.send({ success: true, results: res, });
       })
       .catch((err) => {
-        response.send({ success: false, results: err, });
+        response.send({ success: false, results: err.message, });
       });
   });
 

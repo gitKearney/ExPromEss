@@ -149,13 +149,18 @@ const container = {
   cartController: function() {
     let authService = this.authService();
     let cartService = this.cartService();
-    return new CartController(authService, cartService);
+    let userService = this.userService();
+
+    return new CartController(authService, cartService, userService);
   },
 
   /** @return {CheckoutController} */
   checkoutController: function() {
     let checkoutService = this.checkoutService();
-    return new CheckoutController(checkoutService);
+    let authService = this.authService();
+    let userService = this.userService();
+
+    return new CheckoutController(authService, checkoutService, userService);
   },
 };
 

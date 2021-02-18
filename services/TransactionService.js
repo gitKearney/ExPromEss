@@ -14,7 +14,7 @@ function TransactionService(transactions) {
     
 
     if (user['role'] === 'create' || user['role'] === 'edit') {
-      // admins and support can view this transaction
+      // admins and support can view this transaction (or all transactions)
       return transactions.getTransaction(transactionId, '')
         .then(results => {
           if(results.length === 0) {
@@ -25,7 +25,7 @@ function TransactionService(transactions) {
         });
     }
 
-    // this blocks one user from viewing the transaction of another user
+    // this blocks a normal user account from viewing the transaction of another user
     return transactions.getTransaction(transactionId, user['user_id'])
       .then(results => {
         if(results.length === 0) {

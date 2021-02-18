@@ -6,12 +6,13 @@ function createCheckoutRoutes() {
   let controller = createCheckoutController();
 
   router.post('/', function(request, response) {
-    controller.post(request.body)
+    const auth = request.get('authorization');
+    controller.post(request.body, auth)
       .then(res => {
         response.send({success: true, results: res, });
       })
       .catch(err => {
-        response.send({success: false, results: [], message: err, });
+        response.send({success: false, results: [], message: err.message, });
       });
   });
 

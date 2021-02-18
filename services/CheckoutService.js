@@ -1,6 +1,11 @@
 function CheckoutService(transactions, cart) {
-  this.checkout = function(userId) {
+  this.checkout = function(userId, bearer) {
     let transId = '';
+
+    if (bearer['role'] === 'read' && bearer['user_id'] !== userId) {
+      throw new Error('User Lacks Access');
+    }
+
     return transactions.addTransaction({user_id: userId, })
       .then(id => {
         transId = id;
