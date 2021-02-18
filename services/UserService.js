@@ -3,11 +3,19 @@ let configs = require('../configs/jwt.example');
 
 function UserService(users) {
 
-  this.handleDelete = function(userId) {
+  this.handleDelete = function(userId, bearer) {
+    if (bearer['role'] === 'read' && bearer['user_id'] !== userId) {
+      throw new Error('User Lacks Access');
+    }
+
     return users.deleteUser(userId);
   };
 
-  this.handleGet = function(userId) {
+  this.handleGet = function(userId, bearer) {
+    if (bearer['role'] === 'read' && bearer['user_id'] !== userId) {
+      throw new Error('User Lacks Access');
+    }
+
     return users.getUsers(userId)
       .then(results => {
         // don't expose the password
@@ -17,15 +25,15 @@ function UserService(users) {
           delete results['upassword'];
         }
         return results;
-      })
-      .catch((err) => {
-        console.log('UserService caught error ', err);
-        throw err;
       });
   };
 
-  this.handleUpdate = function(uuid, body) {
-    return users.updateUser(uuid, body);
+  this.handleUpdate = function(userId, body, bearer) {
+    if (bearer['role'] === 'read' && bearer['user_id'] !== userId) {
+      throw new Error('User Lacks Access');
+    }
+
+    return users.updateUser(userId, body);
   };
 
   this.handlePost = function(params) {
