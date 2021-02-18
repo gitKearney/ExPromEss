@@ -83,7 +83,7 @@ function AuthService(user) {
       }
 
       if (!bearer) {
-        reject(new Error('Access Denied'));
+        reject(new Error('Access Denied, Invalid Auth Token'));
         return;
       }
 

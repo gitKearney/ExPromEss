@@ -9,24 +9,26 @@ function createTransactionRouter() {
   let controller = createTransactionController();
 
   router.get('/:uuid', function(request, response) {
-    // TODO: const auth = request.get('authorization');
-    controller.get(request.params['uuid'])
+    const auth = request.get('authorization');
+    let transId = request.params['uuid'] ?? '';
+    controller.get(transId, auth)
       .then(res => {
         response.send({ success: true, results: res, });
       })
       .catch(err => {
-        response.send({ success: false, results: err, });
+        response.send({ success: false, results: err.message, });
       });
   });
 
   router.get('/', function(request, response) {
-    // TODO: const auth = request.get('authorization');
-    controller.get()
+    const auth = request.get('authorization');
+    let transId = request.params['uuid'] ?? '';
+    controller.get(transId, auth)
       .then(res => {
         response.send({ success: true, results: res, });
       })
       .catch(err => {
-        response.send({ success: false, results: err, });
+        response.send({ success: false, results: err.message, });
       });
   });
 
@@ -36,7 +38,7 @@ function createTransactionRouter() {
         response.send({ success: true, results: res, });
       })
       .catch(err => {
-        response.send({ success: false, results: err, });
+        response.send({ success: false, results: err.message, });
       });
   });
 

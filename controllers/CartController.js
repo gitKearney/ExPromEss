@@ -1,12 +1,15 @@
-function CartController(authService, cartService) {
+function CartController(authService, cartService, userService) {
 
   /**
    * returns all items from a user's cart
    * @param {string} userId
    * @return {Promise<[]>}
    */
-  this.get = function(userId) {
-    return cartService.getCart(userId);
+  this.get = function(userId, bearer) {
+    const requires = 'read';
+    return authService.decode(bearer)
+      .then((user) => userService.userHasPermission(user.data['user_id'], requires))
+      .then(() => cartService.getCart(userId));
   };
 
   /**
@@ -14,31 +17,42 @@ function CartController(authService, cartService) {
    * @param {string} userId
    * @return {Promise<boolean>}
    */
-  this.delete = function(userId) {
-    return cartService.clearCart(userId);
+  this.delete = function(userId, bearer) {
+    const requires = 'read';
+    return authService.decode(bearer)
+      .then((user) => userService.userHasPermission(user.data['user_id'], requires))
+      .then(() => cartService.clearCart(userId));
   };
 
   /**
    * removes a single item from the cart
    * @param {string} userId
    * @param {Object} body
+   * @param {string} bearer
    * @return {Promise<boolean>}
    */
-  this.patch = function(userId, body) {
+  this.patch = function(userId, body, bearer) {
+    const requires = 'read';
+
     if(!Object.prototype.hasOwnProperty.call(body, 'product_id')) {
       throw new Error('invalid product');
     }
 
     let productId = body['product_id'];
-    return cartService.removeItem(userId, productId);
+    return authService.decode(bearer)
+    .then((user) => userService.userHasPermission(user.data['user_id'], requires))
+    .then(() => cartService.removeItem(userId, productId));
   };
 
   /**
    * Adds an item to the cart
    * @param {Object} body
+   * @param {string} bearer
    * @return {Promise<boolean>}
    */
-  this.put = function(body) {
+  this.put = function(body, bearer) {
+    const requires = 'read';
+
     if(!Object.prototype.hasOwnProperty.call(body, 'user_id')) {
       throw new Error('invalid user');
     }
@@ -48,7 +62,10 @@ function CartController(authService, cartService) {
 
     let userId = body['user_id'];
     let productId = body['product_id'];
-    return cartService.addItem(userId, productId);
+
+    return authService.decode(bearer)
+      .then((user) => userService.userHasPermission(user.data['user_id'], requires))
+      .then(() => cartService.addItem(userId, productId));
   };
 }
 

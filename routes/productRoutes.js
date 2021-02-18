@@ -10,8 +10,9 @@ function ProductRouter() {
   let productController = createProductController();
 
   productRouter.delete('/:uuid', function(request, response) {
+    const auth = request.get('authorization');
 
-    productController.delete(request.params)
+    productController.delete(request.params, auth)
       .then((res) => {
         response.send({ success: true, results: res, });
       })
@@ -22,7 +23,9 @@ function ProductRouter() {
 
   productRouter.get('/:uuid', function(request, response)
   {
-    productController.get(request.params['uuid'])
+    const auth = request.get('authorization');
+
+    productController.get(request.params['uuid'], auth)
       .then((res) => {
         response.send({ success: true, results: res, });
       })
@@ -34,7 +37,9 @@ function ProductRouter() {
 
   productRouter.patch('/:uuid', function(request, response)
   {
-    productController.patch(request.params['uuid'], request.body)
+    const auth = request.get('authorization');
+
+    productController.patch(request.params['uuid'], request.body, auth)
       .then((res) => {
         response.send({ success: true, results: res, });
       })
@@ -46,7 +51,9 @@ function ProductRouter() {
 
   productRouter.post('/', function(request, response)
   {
-    productController.post(request.body)
+    const auth = request.get('authorization');
+
+    productController.post(request.body, auth)
       .then((res) => {
         response.send({ success: true, results: res, });
       })
@@ -58,7 +65,9 @@ function ProductRouter() {
 
   productRouter.put('/', function(request, response)
   {
-    productController.put(request.body)
+    const auth = request.get('authorization');
+
+    productController.put(request.body, auth)
       .then((res) => {
         response.send({ success: true, results: res, });
       })

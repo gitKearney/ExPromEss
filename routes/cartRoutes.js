@@ -9,8 +9,10 @@ function createCartRoutes() {
   let router = Router();
   let controller = createCartController();
 
-  router.get('/:uuid', function(request, response){
-    controller.get(request.params['uuid'])
+  router.get('/:uuid', function(request, response) {
+    const auth = request.get('authorization');
+
+    controller.get(request.params['uuid'], auth)
       .then(res => {
         response.send({ success: true, results: res, });
       })
@@ -20,7 +22,8 @@ function createCartRoutes() {
   });
 
   router.delete('/:uuid', function(request, response){
-    controller.delete(request.params['uuid'])
+    const auth = request.get('authorization');
+    controller.delete(request.params['uuid'], auth)
       .then(res => {
         response.send({ success: true, results: res, });
       })
@@ -31,7 +34,8 @@ function createCartRoutes() {
 
 
   router.patch('/:uuid', function(request, response){
-    controller.patch(request.params['uuid'], request.body)
+    const auth = request.get('authorization');
+    controller.patch(request.params['uuid'], request.body, auth)
       .then(res => {
         response.send({ success: true, results: res, });
       })
@@ -41,7 +45,8 @@ function createCartRoutes() {
   });
 
   router.put('/', function(request, response){
-    controller.put(request.body)
+    const auth = request.get('authorization');
+    controller.put(request.body, auth)
       .then(res => {
         response.send({ success: true, results: res, });
       })

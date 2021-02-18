@@ -46,13 +46,7 @@ function UserService(users) {
     };
   };
 
-  /**
-   * @param {string} userId
-   * @param {string} requires
-   * @param {string} uuid - the ID the bearer is requesting info about
-   * @return {Promise<Object>}
-   */
-  this.canUserAccess = function(userId, requires, uuid) {
+  this.userHasPermission = function(userId, requires = '') {
     const skipCheck = new Promise((resolve) => {
       if (configs.disable_auth) {
         resolve(true);
@@ -65,20 +59,26 @@ function UserService(users) {
     return skipCheck
       .then((skip) => {
         if (skip) {
-          return true;
+          return {
+            user_id: 'admin',
+            first_name: 'admin',
+            last_name: '',
+            upassword: '',
+            email: '',
+            birthday: '',
+            roles: 'create',
+          };
         }
 
         return users.getUserById(userId);
       })
       .then(rs => {
-        // if auth checking is disabled, just return true
-        if (rs === true) {
-          return true;
-        }
+        let user = {...rs, has_permission: false, };
 
         if(rs['role'] === 'create') {
           // this is the equivalent of admin
-          return true;
+          user['has_permission'] = true;
+          return user;
         }
 
         const needsReadPermission = requires === 'read';
@@ -88,13 +88,13 @@ function UserService(users) {
         const hasReadPermission = rs['role'] === 'read';
 
         if (hasEditPermission && (needsReadPermission || needsEditPermission)) {
-          return true;
+          user['has_permission'] = true;
+          return user;
         }
 
         if (hasReadPermission && needsReadPermission) {
-          if (uuid === rs['user_id']) {
-            return true;
-          }
+          user['has_permission'] = true;
+          return user;
         }
 
         throw (new Error('Permissions Denied, Foo'));

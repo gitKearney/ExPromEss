@@ -31,3 +31,13 @@ it to adhere to the standards
 #### Methods on each class do 1 thing
 #### Methods on a service class call those methods.
 #### Services are "smart". Everything else is dumb
+#### Scripts to help with Development
+I program on a Mac, but use Ubuntu for the MariaDB server
+
+In order to connect to the VM these are the steps
+
+ * (from vm) `ssh -R 2202:localhost:22 kearney@mac_ip_address`
+ * (from mac) `ssh -p 2202 kearney@localhost`
+ * (from vm) `ssh -R 3366:localhost:3306 kearney@mac_ip_address`
+ * (on vm) `ssh-keygen -t rsa` then copy the *id_rsa.pub* file to the mac under *.ssh/authorized_keys* and take 
+   the id_rsa.pub from mac and put on vm in `.ssh/authorized_keys`

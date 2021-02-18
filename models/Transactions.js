@@ -12,16 +12,32 @@ INNER JOIN users AS u ON t.user_id = u.user_id`;
       .then(results => results.resultSet);
   };
 
-  this.getTransaction = function(transId) {
+  this.getAllUserTransactions = function(userId) {
+    let sql = `
+SELECT t.created_at, t.transaction_id, u.first_name, u.last_name    
+FROM transactions AS t 
+INNER JOIN users AS u ON t.user_id = u.user_id
+WHERE user_id = :user_id`;
+
+    return query(sql, { user_id: userId, })
+      .then(results => results.resultSet);
+  };
+
+  this.getTransaction = function(transId, userId) {
     let sql = `SELECT 
 t.user_id, t.created_at, tp.product_price, p.title, u.first_name, u.last_name
 FROM transactions AS t
 INNER JOIN transaction_products AS tp ON t.transaction_id = tp.transaction_id
 INNER JOIN products AS p ON tp.product_id = p.product_id
 INNER JOIN users AS u ON t.user_id = u.user_id
-WHERE t.transaction_id = :trans_id`;
+WHERE t.transaction_id = :trans_id
+`;
 
-    return query(sql, { trans_id: transId, })
+    if (userId.length === 36) {
+      sql += ' AND t.user_id = :user_id';
+    }
+
+    return query(sql, { trans_id: transId, user_id: userId, })
       .then(results => results.resultSet);
   };
 

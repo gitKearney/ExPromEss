@@ -1,12 +1,32 @@
 
 function TransactionService(transactions) {
 
-  this.getTransactions = function(transactionId) {
+  this.getTransactions = function(transactionId, user) {
     if (transactionId === '') {
-      return transactions.getAllTransactions();
+      if (user['user_id'] === 'admin') {
+        // we're skipping auth checking, just get all transactions
+        return transactions.getAllTransactions();
+      }
+
+      // else, allow this user to view all his/her transactions
+      return transactions.getAllUserTransactions(user['user_id']);
+    }
+    
+
+    if (user['role'] === 'create' || user['role'] === 'edit') {
+      // admins and support can view this transaction
+      return transactions.getTransaction(transactionId, '')
+        .then(results => {
+          if(results.length === 0) {
+            return [];
+          }
+
+          return results;
+        });
     }
 
-    return transactions.getTransaction(transactionId)
+    // this blocks one user from viewing the transaction of another user
+    return transactions.getTransaction(transactionId, user['user_id'])
       .then(results => {
         if(results.length === 0) {
           return [];
