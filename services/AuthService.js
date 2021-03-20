@@ -4,8 +4,44 @@ let appConfigs  = require('../configs/jwt.example');
 
 function AuthService(user) {
 
-  this.createToken = function(body) {
+  this.testCreateToken = function() {
     const info = { email: '', user_id: '', };
+
+    return new Promise((resolve) => {
+      let currentTime = Math.floor(Date.now() / 1000);
+
+      // create a JWT token
+      let tokenData = {
+        // audience: JWT's audience
+        aud: appConfigs.jwt.audience,
+
+        // data is our user's info
+        data: info,
+
+        // expiresIn is how many seconds till this token expires
+        exp: currentTime + (60 * appConfigs.jwt.expire),
+
+        // issued at time: the time the token is issued at
+        iat: currentTime,
+
+        // the issuer of this token
+        iss: appConfigs.jwt.issuer,
+
+        // not before: the token is not good for anytime before this timestamp
+        nbf: currentTime,
+      };
+
+      let token = jwt.sign(tokenData, appConfigs.jwt.secret);
+      resolve ({
+        success: true,
+        message: 'success',
+        results: token,
+      });
+    });
+  };
+
+  this.createToken = function(body) {
+    const info = { email: 'skip', user_id: '100', };
 
     if (!Object.prototype.hasOwnProperty.call(body, 'password') ||
         !Object.prototype.hasOwnProperty.call(body, 'email'))

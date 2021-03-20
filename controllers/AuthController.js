@@ -1,6 +1,6 @@
 function AuthController(authService) {
   this.post = function(request) {
-    return authService.createToken(request.body);
+    return authService.testCreateToken(request.body);
   };
 }
 
