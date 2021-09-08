@@ -1,4 +1,4 @@
-const TimeService = require('../services/timeService');
+const TimeService = require('../services/TimeService');
 
 function printDate(date = null) {
   let formatDate = date;

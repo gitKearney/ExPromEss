@@ -5,10 +5,10 @@ let Transactions = require('../models/Transactions');
 let Cart         = require('../models/Cart');
 
 /** * IMPORT SERVICES ***/
-let AuthService    = require('../services/authService');
-let TimeService    = require('../services/timeService');
-let UserService    = require('../services/userService');
-let ProductService = require('../services/productService');
+let AuthService    = require('../services/AuthService');
+let TimeService    = require('../services/TimeService');
+let UserService    = require('../services/UserService');
+let ProductService = require('../services/ProductService');
 let CartService    = require('../services/CartService');
 let TransactionService = require('../services/TransactionService');
 let CheckoutService    = require('../services/CheckoutService');
